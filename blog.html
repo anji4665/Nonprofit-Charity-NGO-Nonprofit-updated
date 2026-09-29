@@ -1,0 +1,2276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Stackly Nonprofit Blog - Insights, stories and articles about charity, education, clean water and healthcare.">
+    <title>Blog - Stackly Nonprofit</title>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600;1,700&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        /* ================================================================
+           CSS VARIABLES
+           ================================================================ */
+        :root {
+            /* --- Blog page palette --- */
+            --primary-green: #0D4E3B;
+            --accent-yellow: #FDE16D;
+            --text-dark: #1A1A1A;
+            --text-gray: #666666;
+            --bg-light: #F9F9F9;
+            --white: #FFFFFF;
+            --border-color: #EAEAEA;
+
+            /* --- Shared header / footer palette --- */
+            --clr-green-dark: #155c3a;
+            --clr-green-deep: #0e4a2d;
+            --clr-green-mid: #1a6b43;
+            --clr-yellow: #e8b730;
+            --clr-yellow-light: #f5d76e;
+            --clr-white: #ffffff;
+            --clr-black: #111111;
+            --clr-text: #333333;
+            --clr-text-light: #666666;
+            --clr-gray-dark: #555555;
+            --clr-gray-light: #f2f2f2;
+
+            /* --- Typography --- */
+            --ff-heading: 'Playfair Display', Georgia, 'Times New Roman', serif;
+            --ff-body: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+
+            /* --- Layout --- */
+            --container-max: 1200px;
+            --container-padding: 0 24px;
+            --header-height: 88px;
+
+            /* --- Transitions --- */
+            --transition: 0.3s ease;
+        }
+
+        /* ================================================================
+           RESET
+           ================================================================ */
+        *,
+        *::before,
+        *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+            font-size: 16px;
+            overflow-x: hidden;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--white);
+            color: var(--text-dark);
+            line-height: 1.6;
+            overflow-x: hidden;
+            padding-top: var(--header-height);
+        }
+
+        body.nav-open {
+            overflow: hidden;
+        }
+
+        body.popup-open {
+            overflow: hidden;
+        }
+
+        a {
+            text-decoration: none;
+            color: inherit;
+            transition: var(--transition);
+        }
+
+        ul {
+            list-style: none;
+        }
+
+        img {
+            max-width: 100%;
+            height: auto;
+            display: block;
+        }
+
+        button,
+        input {
+            font-family: inherit;
+        }
+
+        .container {
+            max-width: var(--container-max);
+            margin: 0 auto;
+            padding: var(--container-padding);
+        }
+
+        /* ================================================================
+           PRELOADER  —  Stackly Nonprofit
+           ================================================================ */
+        body.preloader-active {
+            overflow: hidden;
+        }
+
+        .preloader {
+            position: fixed;
+            inset: 0;
+            z-index: 3000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background:
+                radial-gradient(circle at 50% 42%, rgba(232, 183, 48, 0.15) 0%, rgba(232, 183, 48, 0) 58%),
+                linear-gradient(160deg, #0e4a2d 0%, #094C3B 52%, #072a1b 100%);
+            opacity: 1;
+            visibility: visible;
+            transition: opacity 0.45s ease, visibility 0.45s ease;
+        }
+
+        .preloader--done {
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+        }
+
+        .preloader__inner {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            padding: 0 24px;
+            animation: preFadeUp 0.6s cubic-bezier(0.22, 1, 0.36, 1) both;
+        }
+
+        @keyframes preFadeUp {
+            from { opacity: 0; transform: translateY(14px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        .preloader__mark {
+            position: relative;
+            width: 116px;
+            height: 116px;
+            margin-bottom: 26px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .preloader__mark::before {
+            content: '';
+            position: absolute;
+            inset: -18px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(232, 183, 48, 0.24) 0%, rgba(232, 183, 48, 0) 70%);
+            animation: prePulse 2.2s ease-in-out infinite;
+        }
+
+        @keyframes prePulse {
+            0%, 100% { transform: scale(0.9);  opacity: 0.55; }
+            50%      { transform: scale(1.08); opacity: 1; }
+        }
+
+        .preloader__ring {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            transform: rotate(-90deg);
+        }
+
+        .preloader__ring-track {
+            fill: none;
+            stroke: rgba(255, 255, 255, 0.13);
+            stroke-width: 4;
+        }
+
+        .preloader__ring-progress {
+            fill: none;
+            stroke: #e8b730;
+            stroke-width: 4;
+            stroke-linecap: round;
+            stroke-dasharray: 100;
+            stroke-dashoffset: 100;
+            transition: stroke-dashoffset 0.18s linear;
+            filter: drop-shadow(0 0 6px rgba(232, 183, 48, 0.55));
+        }
+
+        .preloader__heart {
+            position: relative;
+            width: 44px;
+            height: 44px;
+            animation: preBeat 1.6s ease-in-out infinite;
+        }
+
+        .preloader__heart-path {
+            fill: rgba(255, 255, 255, 0.08);
+            stroke: #ffffff;
+            stroke-width: 3;
+            stroke-linejoin: round;
+            stroke-linecap: round;
+            stroke-dasharray: 100;
+            stroke-dashoffset: 100;
+            animation: preDraw 1.5s ease-out 0.15s forwards;
+        }
+
+        @keyframes preDraw {
+            to { stroke-dashoffset: 0; }
+        }
+
+        @keyframes preBeat {
+            0%, 100% { transform: scale(1); }
+            14%      { transform: scale(1.13); }
+            28%      { transform: scale(1); }
+            42%      { transform: scale(1.08); }
+            56%      { transform: scale(1); }
+        }
+
+        .preloader__brand {
+            font-family: var(--ff-heading);
+            font-size: 1.85rem;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            color: #ffffff;
+            line-height: 1;
+            margin-bottom: 10px;
+        }
+
+        .preloader__tagline {
+            font-family: var(--ff-body);
+            font-size: 0.82rem;
+            font-weight: 400;
+            letter-spacing: 0.4px;
+            color: rgba(255, 255, 255, 0.62);
+            max-width: 300px;
+            line-height: 1.55;
+            margin-bottom: 30px;
+        }
+
+        .preloader__progress {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            width: min(240px, 72vw);
+        }
+
+        .preloader__bar {
+            position: relative;
+            flex: 1;
+            height: 4px;
+            border-radius: 99px;
+            background: rgba(255, 255, 255, 0.14);
+            overflow: hidden;
+        }
+
+        .preloader__bar-fill {
+            display: block;
+            height: 100%;
+            width: 0%;
+            border-radius: 99px;
+            background: linear-gradient(90deg, #e8b730, #f5d76e);
+            transition: width 0.18s linear;
+            box-shadow: 0 0 10px rgba(232, 183, 48, 0.5);
+        }
+
+        .preloader__pct {
+            font-family: var(--ff-body);
+            font-size: 0.78rem;
+            font-weight: 600;
+            color: rgba(255, 255, 255, 0.78);
+            min-width: 36px;
+            text-align: right;
+            font-variant-numeric: tabular-nums;
+        }
+
+        @media (max-width: 480px) {
+            .preloader__mark { width: 96px; height: 96px; margin-bottom: 22px; }
+            .preloader__heart { width: 36px; height: 36px; }
+            .preloader__brand { font-size: 1.55rem; }
+            .preloader__tagline { font-size: 0.76rem; margin-bottom: 24px; }
+            .preloader__progress { width: min(210px, 74vw); }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .preloader__inner,
+            .preloader__mark::before,
+            .preloader__heart,
+            .preloader__heart-path {
+                animation: none !important;
+            }
+            .preloader__heart-path { stroke-dashoffset: 0; }
+            .preloader__ring-progress,
+            .preloader__bar-fill { transition: none; }
+        }
+
+        /* ================================================================
+           BUTTONS (shared – used by header)
+           ================================================================ */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-family: var(--ff-body);
+            font-weight: 500;
+            font-size: 0.9rem;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: var(--transition);
+            border: none;
+            white-space: nowrap;
+        }
+
+        .btn--signup {
+            background-color: var(--clr-green-dark);
+            color: var(--clr-white);
+            padding: 11px 28px;
+            font-weight: 600;
+            font-size: 0.85rem;
+        }
+
+        .btn--signup:hover {
+            background-color: var(--clr-green-deep);
+            transform: translateY(-1px);
+        }
+
+        .btn--yellow-sm {
+            background-color: var(--clr-yellow);
+            color: var(--clr-black);
+            padding: 10px 24px;
+            font-weight: 600;
+            font-size: 0.85rem;
+        }
+
+        .btn--yellow-sm:hover {
+            background-color: var(--clr-yellow-light);
+            transform: translateY(-1px);
+        }
+
+        /* ================================================================
+           HEADER / NAVIGATION (matches Home page)
+           ================================================================ */
+        .header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            z-index: 1000;
+            background: var(--clr-white);
+            transition: var(--transition);
+            font-family: var(--ff-body);
+        }
+
+        .header.scrolled {
+            box-shadow: 0 2px 20px rgba(0, 0, 0, 0.08);
+        }
+
+        .header__container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding-top: 22px;
+            padding-bottom: 22px;
+        }
+
+        .header__logo {
+            display: flex;
+            align-items: center;
+            gap: 0;
+            font-family: var(--ff-heading);
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--clr-black);
+            line-height: 1;
+        }
+
+        .header__logo-icon {
+            flex-shrink: 0;
+            width: 38px;
+            height: 42px;
+            object-fit: contain;
+            margin-right: -4px;
+        }
+
+        .header__nav {
+            display: flex;
+            align-items: center;
+        }
+
+        .header__nav-list {
+            display: flex;
+            align-items: center;
+            gap: 32px;
+        }
+
+        .header__nav-link {
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: var(--clr-text);
+            position: relative;
+            padding: 4px 0;
+        }
+
+        .header__nav-link::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background-color: var(--clr-yellow);
+            transition: var(--transition);
+        }
+
+        .header__nav-link:hover::after,
+        .header__nav-link.active::after {
+            width: 100%;
+        }
+
+        .header__nav-link:hover,
+        .header__nav-link.active {
+            color: var(--clr-green-dark);
+        }
+
+        /* Mobile-only Sign Up item (hidden on desktop) */
+        .header__nav-cta {
+            display: none;
+        }
+
+        .header__hamburger {
+            display: none;
+            flex-direction: column;
+            gap: 5px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 4px;
+            z-index: 1001;
+        }
+
+        .header__hamburger span {
+            display: block;
+            width: 26px;
+            height: 2.5px;
+            background-color: var(--clr-black);
+            border-radius: 2px;
+            transition: var(--transition);
+        }
+
+        .header__hamburger.active span:nth-child(1) {
+            transform: rotate(45deg) translate(5px, 5px);
+        }
+
+        .header__hamburger.active span:nth-child(2) {
+            opacity: 0;
+        }
+
+        .header__hamburger.active span:nth-child(3) {
+            transform: rotate(-45deg) translate(6px, -6px);
+        }
+
+        /* Mobile nav overlay */
+        .nav-overlay {
+            position: fixed;
+            inset: 0;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 999;
+            opacity: 0;
+            visibility: hidden;
+            transition: var(--transition);
+        }
+
+        .nav-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        /* ================================================================
+           HERO SECTION (BLOG)
+           ================================================================ */
+        .hero {
+            background-color: var(--primary-green);
+            color: var(--white);
+            text-align: center;
+            padding: 100px 5%;
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 350px;
+        }
+
+        .hero-content h1 {
+            font-size: 4rem;
+            font-weight: 700;
+            margin-bottom: 15px;
+        }
+
+        .hero-content p {
+            font-size: 1rem;
+            font-weight: 400;
+            opacity: 0.9;
+        }
+
+        /* Decorative Leaves */
+        .hero-leaf-left,
+        .hero-leaf-right {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 250px;
+            opacity: 0.8;
+            pointer-events: none;
+        }
+
+        .hero-leaf-left { left: 5%; }
+        .hero-leaf-right { right: 5%; transform: translateY(-50%) scaleX(-1); }
+
+        /* ================================================================
+           FEATURED BLOG SECTION
+           ================================================================ */
+        .featured-blog-section {
+            padding: 80px 5% 60px;
+            max-width: 1300px;
+            margin: 0 auto;
+            text-align: center;
+            position: relative;
+        }
+
+        .section-header {
+            margin-bottom: 50px;
+        }
+
+        .section-header h2 {
+            font-size: 2.2rem;
+            font-weight: 700;
+            color: var(--text-dark);
+            margin-bottom: 15px;
+        }
+
+        .section-header p {
+            color: var(--text-gray);
+            font-size: 15px;
+            line-height: 1.7;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .header-decoration {
+            position: absolute;
+            right: 10%;
+            top: 80px;
+            width: 60px;
+            opacity: 0.7;
+        }
+
+        .featured-card {
+            display: flex;
+            background-color: var(--accent-yellow);
+            border-radius: 8px;
+            overflow: hidden;
+            text-align: left;
+            position: relative;
+        }
+
+        .featured-image {
+            flex: 1;
+            position: relative;
+            min-height: 420px;
+        }
+
+        .featured-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            position: absolute;
+            top: 0;
+            left: 0;
+        }
+
+        .featured-image::after {
+            content: '';
+            position: absolute;
+            right: -1px;
+            top: 0;
+            height: 100%;
+            width: 60px;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100' preserveAspectRatio='none'%3E%3Cpath d='M100,0 C80,20 50,30 50,50 C50,70 80,80 100,100 L100,0 Z' fill='%23FDE16D'/%3E%3C/svg%3E");
+            background-size: 100% 100%;
+            background-repeat: no-repeat;
+        }
+
+        .featured-content {
+            flex: 1;
+            padding: 60px 80px 60px 40px;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .featured-subtitle {
+            color: var(--primary-green);
+            font-size: 14px;
+            font-weight: 600;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            margin-bottom: 15px;
+            display: block;
+        }
+
+        .featured-content h3 {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--text-dark);
+            line-height: 1.3;
+            margin-bottom: 20px;
+        }
+
+        .featured-content p {
+            font-size: 15px;
+            line-height: 1.7;
+            color: var(--text-dark);
+            margin-bottom: 30px;
+            opacity: 0.8;
+        }
+
+        .btn-primary-green {
+            background-color: var(--primary-green);
+            color: var(--white);
+            padding: 12px 30px;
+            border-radius: 30px;
+            font-weight: 500;
+            border: none;
+            cursor: pointer;
+            transition: background 0.3s;
+            align-self: flex-start;
+        }
+
+        .btn-primary-green:hover {
+            background-color: #093b2c;
+        }
+
+        .card-bottom-decorations {
+            position: absolute;
+            bottom: 20px;
+            right: 30px;
+            display: flex;
+            gap: 20px;
+            opacity: 0.6;
+        }
+
+        .card-bottom-decorations img {
+            width: 40px;
+        }
+
+        /* ================================================================
+           BLOG GRID SECTION
+           ================================================================ */
+        .blog-grid-section {
+            padding: 60px 5% 100px;
+            max-width: 1300px;
+            margin: 0 auto;
+            text-align: center;
+        }
+
+        .grid-subtitle {
+            color: var(--text-gray);
+            font-size: 14px;
+            font-weight: 600;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            margin-bottom: 15px;
+            display: block;
+        }
+
+        .blog-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 30px;
+            text-align: left;
+            margin-top: 50px;
+        }
+
+        .blog-card {
+            background: var(--white);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.02);
+            transition: transform 0.3s;
+        }
+
+        .blog-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.06);
+        }
+
+        .blog-card img {
+            width: 100%;
+            height: 220px;
+            object-fit: cover;
+        }
+
+        .blog-card-content {
+            padding: 25px;
+            display: flex;
+            flex-direction: column;
+            flex-grow: 1;
+        }
+
+        .blog-meta {
+            font-size: 13px;
+            color: var(--text-gray);
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .blog-meta span.dot {
+            width: 4px;
+            height: 4px;
+            background-color: var(--text-gray);
+            border-radius: 50%;
+            display: inline-block;
+        }
+
+        .blog-card h4 {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--text-dark);
+            margin-bottom: 15px;
+            line-height: 1.4;
+        }
+
+        .blog-card p {
+            font-size: 14px;
+            color: var(--text-gray);
+            line-height: 1.6;
+            margin-bottom: 25px;
+        }
+
+        .btn-card-yellow {
+            background-color: var(--accent-yellow);
+            color: var(--text-dark);
+            padding: 10px 25px;
+            border-radius: 30px;
+            font-weight: 500;
+            border: none;
+            cursor: pointer;
+            transition: background 0.3s;
+            align-self: flex-start;
+            margin-top: auto;
+        }
+
+        .btn-card-yellow:hover {
+            background-color: #e5c857;
+        }
+
+        .btn-card-green {
+            background-color: var(--primary-green);
+            color: var(--white);
+            padding: 10px 25px;
+            border-radius: 30px;
+            font-weight: 500;
+            border: none;
+            cursor: pointer;
+            transition: background 0.3s;
+            align-self: flex-start;
+            margin-top: auto;
+        }
+
+        .btn-card-green:hover {
+            background-color: #093b2c;
+        }
+
+        /* ================================================================
+           READ NOW LINKS — make anchors behave like buttons
+           ================================================================ */
+        .btn-primary-green,
+        .btn-card-yellow,
+        .btn-card-green {
+            display: inline-block;
+            text-align: center;
+            text-decoration: none;
+            font-family: 'Poppins', sans-serif;
+            font-size: 14px;
+        }
+
+        /* ================================================================
+           NEWSLETTER SECTION
+           ================================================================ */
+        .newsletter-section {
+            background-color: #0D4E3B;
+            padding: 80px 20px;
+            position: relative;
+            overflow: hidden;
+            text-align: center;
+            color: #ffffff;
+        }
+
+        .newsletter-decor {
+            position: absolute;
+            pointer-events: none;
+            opacity: 0.9;
+            z-index: 1;
+        }
+
+        .newsletter-decor--envelope { top: 30px; left: 5%; width: 80px; }
+        .newsletter-decor--gift     { bottom: 30px; left: 8%; width: 60px; }
+        .newsletter-decor--flower   { top: 30px; right: 5%; width: 80px; }
+        .newsletter-decor--jar      { bottom: 30px; right: 8%; width: 60px; }
+
+        .newsletter-decor--star1 { top: 20px; left: 15%; width: 15px; }
+        .newsletter-decor--star2 { bottom: 40px; left: 20%; width: 10px; }
+        .newsletter-decor--star3 { top: 40px; right: 15%; width: 15px; }
+        .newsletter-decor--star4 { bottom: 50px; right: 20%; width: 10px; }
+
+        .newsletter-content {
+            max-width: 800px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 2;
+        }
+
+        .newsletter-content h2 {
+            font-size: 2.2rem;
+            font-weight: 700;
+            margin-bottom: 20px;
+        }
+
+        .newsletter-content p {
+            font-size: 15px;
+            line-height: 1.6;
+            margin-bottom: 40px;
+            opacity: 0.9;
+            max-width: 700px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .newsletter-form {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .newsletter-input {
+            flex: 1;
+            padding: 16px 25px;
+            border-radius: 50px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            background-color: rgba(255, 255, 255, 0.05);
+            color: #fff;
+            font-family: 'Poppins', sans-serif;
+            font-size: 14px;
+            outline: none;
+            transition: border-color 0.3s;
+            min-width: 0;
+        }
+
+        .newsletter-input::placeholder {
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .newsletter-input:focus {
+            border-color: rgba(255, 255, 255, 0.5);
+        }
+
+        .newsletter-btn {
+            background-color: #FDE16D;
+            color: #1A1A1A;
+            border: none;
+            padding: 16px 35px;
+            border-radius: 50px;
+            font-weight: 600;
+            font-family: 'Poppins', sans-serif;
+            font-size: 14px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            white-space: nowrap;
+        }
+
+        .newsletter-btn:hover {
+            background-color: #e5c857;
+        }
+
+        /* Newsletter section – invalid input state */
+        .newsletter-input.input-error {
+            border-color: #e74c3c;
+            box-shadow: 0 0 0 2px rgba(231, 76, 60, 0.25);
+        }
+
+        .newsletter-input.shake {
+            animation: shakeInput 0.4s ease;
+        }
+
+        /* ================================================================
+           FOOTER  (homepage version)
+           ================================================================ */
+        .footer {
+            background-color: #132A1E;
+            color: var(--clr-white);
+            padding: 80px 0 0;
+            font-family: var(--ff-body);
+        }
+
+        .footer__grid {
+            display: grid;
+            grid-template-columns: 1.5fr 1fr 1.2fr 1.5fr 2fr;
+            gap: 30px;
+            padding-bottom: 50px;
+        }
+
+        .footer__col {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .footer__logo {
+            display: flex;
+            align-items: center;
+            gap: 0;
+            font-family: var(--ff-heading);
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--clr-white);
+            margin-bottom: 24px;
+            line-height: 1;
+            width: fit-content;
+            max-width: max-content;
+        }
+
+        .footer__logo-icon {
+            flex-shrink: 0;
+            width: 38px;
+            height: 42px;
+            object-fit: contain;
+            margin-right: -4px;
+        }
+
+        .footer__brand-text {
+            font-size: 0.95rem;
+            line-height: 1.6;
+            color: rgba(255, 255, 255, 0.85);
+        }
+
+        .footer__title {
+            font-family: var(--ff-body);
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--clr-white);
+            margin-bottom: 24px;
+        }
+
+        .footer__links {
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+
+        .footer__links a {
+            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.65);
+            transition: var(--transition);
+        }
+
+        .footer__links a:hover {
+            color: var(--clr-white);
+            padding-left: 4px;
+        }
+
+        .footer__contact-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.65);
+            margin-bottom: 14px;
+        }
+
+        .footer__contact-item svg {
+            flex-shrink: 0;
+            color: #2ecc71;
+        }
+
+        .footer__newsletter-form {
+            display: flex;
+            background-color: var(--clr-white);
+            border-radius: 4px;
+            overflow: hidden;
+            margin-bottom: 12px;
+        }
+
+        .footer__newsletter-input {
+            flex: 1;
+            padding: 14px 16px;
+            border: none;
+            outline: none;
+            font-family: var(--ff-body);
+            font-size: 0.9rem;
+            color: var(--clr-text);
+            min-width: 0;
+        }
+
+        .footer__newsletter-input::placeholder {
+            color: #888;
+        }
+
+        .footer__newsletter-btn {
+            background-color: #1ABC9C;
+            color: var(--clr-white);
+            border: none;
+            padding: 0 28px;
+            font-family: var(--ff-body);
+            font-weight: 600;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .footer__newsletter-btn:hover {
+            background-color: #16a085;
+        }
+
+        .footer__newsletter-note {
+            font-size: 0.8rem;
+            color: rgba(255, 255, 255, 0.5);
+            margin-bottom: 24px;
+        }
+
+        .footer__social-title {
+            font-family: var(--ff-body);
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--clr-white);
+            margin-bottom: 16px;
+        }
+
+        .footer__socials {
+            display: flex;
+            gap: 12px;
+        }
+
+        .footer__social-icon {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            background-color: var(--clr-white);
+            color: #132A1E;
+            transition: var(--transition);
+        }
+
+        .footer__social-icon:hover {
+            transform: translateY(-3px);
+            background-color: #1ABC9C;
+            color: var(--clr-white);
+        }
+
+        .footer__bottom {
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 24px 0;
+        }
+
+        .footer__bottom-inner {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 12px 28px;
+        }
+
+        .footer__bottom p {
+            font-size: 0.85rem;
+            color: rgba(255, 255, 255, 0.5);
+            margin: 0;
+        }
+
+        .footer__bottom-links {
+            display: flex;
+            align-items: center;
+            gap: 26px;
+        }
+
+        .footer__bottom-links a {
+            font-size: 0.85rem;
+            color: rgba(255, 255, 255, 0.5);
+            transition: var(--transition);
+        }
+
+        .footer__bottom-links a:hover {
+            color: var(--clr-white);
+        }
+
+        /* ================================================================
+           NEWSLETTER POPUP
+           ================================================================ */
+        .popup {
+            position: fixed;
+            inset: 0;
+            z-index: 2000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+        }
+
+        .popup.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .popup__overlay {
+            position: absolute;
+            inset: 0;
+            background-color: rgba(0, 0, 0, 0.55);
+            -webkit-backdrop-filter: blur(2px);
+            backdrop-filter: blur(2px);
+        }
+
+        .popup__box {
+            position: relative;
+            z-index: 1;
+            width: 100%;
+            max-width: 400px;
+            background-color: var(--clr-white);
+            border-radius: 16px;
+            padding: 36px 30px 30px;
+            text-align: center;
+            box-shadow: 0 24px 70px rgba(0, 0, 0, 0.3);
+            transform: translateY(24px) scale(0.95);
+            transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+
+        .popup.active .popup__box {
+            transform: translateY(0) scale(1);
+        }
+
+        .popup__icon {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 68px;
+            height: 68px;
+            margin: 0 auto 18px;
+            border-radius: 50%;
+        }
+
+        .popup__icon--success {
+            background-color: #e3f5ec;
+            color: var(--clr-green-dark);
+        }
+
+        .popup__icon--error {
+            background-color: #fdeaea;
+            color: #c0392b;
+        }
+
+        .popup__title {
+            font-family: var(--ff-body);
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--clr-black);
+            margin-bottom: 10px;
+        }
+
+        .popup__msg {
+            font-size: 0.9rem;
+            line-height: 1.65;
+            color: var(--clr-text-light);
+            margin-bottom: 26px;
+            word-break: break-word;
+        }
+
+        .popup__btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            padding: 13px 24px;
+            border: none;
+            border-radius: 50px;
+            background-color: var(--clr-green-dark);
+            color: var(--clr-white);
+            font-family: var(--ff-body);
+            font-weight: 600;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .popup__btn:hover {
+            background-color: var(--clr-green-deep);
+            transform: translateY(-1px);
+        }
+
+        .popup__close {
+            position: absolute;
+            top: 12px;
+            right: 14px;
+            width: 34px;
+            height: 34px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: none;
+            background: transparent;
+            color: #999;
+            font-size: 1.4rem;
+            line-height: 1;
+            cursor: pointer;
+            border-radius: 50%;
+            transition: var(--transition);
+        }
+
+        .popup__close:hover {
+            background-color: var(--clr-gray-light);
+            color: var(--clr-black);
+        }
+
+        /* Invalid input state */
+        .footer__newsletter-input.input-error {
+            box-shadow: inset 0 0 0 2px #e74c3c;
+        }
+
+        @keyframes shakeInput {
+            0%, 100% { transform: translateX(0); }
+            20%      { transform: translateX(-5px); }
+            40%      { transform: translateX(5px); }
+            60%      { transform: translateX(-3px); }
+            80%      { transform: translateX(3px); }
+        }
+
+        .footer__newsletter-input.shake {
+            animation: shakeInput 0.4s ease;
+        }
+
+        /* ================================================================
+           RESPONSIVE – TABLET (max-width: 992px)
+           ================================================================ */
+        @media (max-width: 992px) {
+            .hero-content h1 { font-size: 3rem; }
+            .hero-leaf-left, .hero-leaf-right { width: 150px; }
+
+            .featured-card { flex-direction: column; }
+            .featured-image { min-height: 380px; }
+            .featured-image::after { display: none; }
+            .featured-content { padding: 50px 40px; }
+            .featured-content h3 { font-size: 1.7rem; }
+
+            .blog-grid { grid-template-columns: repeat(2, 1fr); }
+
+            .footer__grid {
+                grid-template-columns: repeat(3, 1fr);
+                gap: 40px 28px;
+            }
+            .footer__newsletter-btn {
+                padding: 0 18px;
+                font-size: 0.82rem;
+            }
+        }
+
+        /* ================================================================
+           RESPONSIVE – MOBILE (max-width: 768px)
+           Header matches Home page drawer exactly
+           ================================================================ */
+        @media (max-width: 768px) {
+            :root {
+                --header-height: 70px;
+                --container-padding: 0 18px;
+            }
+
+            /* ---------------- HEADER / MOBILE NAV ---------------- */
+            .header__container {
+                padding-top: 16px;
+                padding-bottom: 16px;
+            }
+
+            .header__logo { font-size: 1.3rem; }
+            .header__logo-icon { width: 32px; height: 36px; }
+
+            .btn--signup { display: none; }
+            .header__hamburger { display: flex; }
+
+            .header__nav {
+                position: fixed;
+                top: 0;
+                right: -100%;
+                width: min(310px, 84vw);
+                height: 100vh;
+                height: 100dvh;
+                background-color: var(--clr-green-dark);
+                flex-direction: column;
+                justify-content: center;
+                align-items: center;
+                padding: 84px 24px 40px;
+                overflow-y: auto;
+                transition: right 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+                box-shadow: -5px 0 30px rgba(0, 0, 0, 0.3);
+            }
+
+            .header__nav.open { right: 0; }
+
+            .header__nav-list {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 6px;
+                width: 100%;
+            }
+
+            .header__nav-list li { width: 100%; }
+
+            .header__nav-link {
+                display: block;
+                width: 100%;
+                padding: 14px 12px;
+                font-size: 1.05rem;
+                color: var(--clr-white);
+                border-radius: 10px;
+                text-align: center;
+            }
+
+            .header__nav-link::after { display: none; }
+
+            .header__nav-link:hover,
+            .header__nav-link.active {
+                background-color: rgba(255, 255, 255, 0.1);
+                color: var(--clr-yellow);
+            }
+
+            /* Mobile-only Sign Up button inside drawer */
+            .header__nav-cta {
+                display: block;
+                margin-top: 18px;
+            }
+
+            .header__nav-cta .btn {
+                width: 100%;
+                padding: 14px 24px;
+                font-size: 0.95rem;
+            }
+
+            /* ---------------- HERO ---------------- */
+            .hero { padding: 72px 20px 64px; min-height: 240px; }
+            .hero-content h1 { font-size: clamp(1.9rem, 7vw, 2.5rem); margin-bottom: 10px; }
+            .hero-content p { font-size: 0.9rem; }
+            .hero-leaf-left, .hero-leaf-right { display: none; }
+
+            /* ---------------- FEATURED BLOG ---------------- */
+            .featured-blog-section { padding: 48px 18px 40px; }
+            .section-header { margin-bottom: 32px; }
+            .section-header h2 { font-size: 1.45rem; line-height: 1.35; }
+            .section-header p { font-size: 0.9rem; }
+            .header-decoration { display: none; }
+
+            .featured-card { border-radius: 8px; }
+            .featured-image { min-height: 240px; }
+            .featured-content { padding: 28px 22px 32px; }
+            .featured-subtitle { font-size: 12px; letter-spacing: 1.8px; margin-bottom: 12px; }
+            .featured-content h3 { font-size: 1.25rem; line-height: 1.35; margin-bottom: 14px; }
+            .featured-content p { font-size: 0.88rem; line-height: 1.65; margin-bottom: 22px; }
+            .btn-primary-green {
+                width: 100%;
+                padding: 13px 24px;
+                font-size: 0.9rem;
+                text-align: center;
+            }
+            .card-bottom-decorations { display: none; }
+
+            /* ---------------- BLOG GRID ---------------- */
+            .blog-grid-section { padding: 40px 18px 64px; }
+            .grid-subtitle { font-size: 12px; letter-spacing: 1.8px; margin-bottom: 12px; }
+            .blog-grid-section .section-header h2 {
+                font-size: 1.4rem;
+                line-height: 1.35;
+            }
+            .blog-grid {
+                grid-template-columns: 1fr;
+                gap: 22px;
+                margin-top: 32px;
+            }
+            .blog-card { border-radius: 8px; }
+            .blog-card img { height: 210px; }
+            .blog-card-content { padding: 20px; }
+            .blog-meta { font-size: 12px; margin-bottom: 12px; }
+            .blog-card h4 { font-size: 1.02rem; margin-bottom: 12px; }
+            .blog-card p { font-size: 13px; margin-bottom: 20px; }
+            .btn-card-yellow,
+            .btn-card-green {
+                width: 100%;
+                text-align: center;
+                padding: 11px 22px;
+                font-size: 0.85rem;
+            }
+
+            /* ---------------- NEWSLETTER ---------------- */
+            .newsletter-section { padding: 56px 18px; }
+            .newsletter-content h2 { font-size: 1.5rem; line-height: 1.3; }
+            .newsletter-content p { font-size: 0.88rem; margin-bottom: 28px; }
+            .newsletter-form {
+                flex-direction: column;
+                gap: 12px;
+                max-width: 100%;
+            }
+            .newsletter-input {
+                padding: 15px 22px;
+                font-size: 0.88rem;
+                text-align: center;
+            }
+            .newsletter-btn {
+                width: 100%;
+                padding: 15px 24px;
+                font-size: 0.9rem;
+            }
+
+            /* Smaller + hide some decorative elements on mobile */
+            .newsletter-decor--envelope,
+            .newsletter-decor--flower { width: 50px; top: 14px; }
+            .newsletter-decor--gift,
+            .newsletter-decor--jar { width: 40px; bottom: 14px; }
+            .newsletter-decor--star1,
+            .newsletter-decor--star2,
+            .newsletter-decor--star3,
+            .newsletter-decor--star4 { display: none; }
+
+            /* ---------------- FOOTER ---------------- */
+            .footer { padding: 60px 0 0; }
+            .footer__grid {
+                grid-template-columns: 1fr;
+                gap: 40px;
+                text-align: center;
+                padding-bottom: 40px;
+            }
+            .footer__col { align-items: center; }
+            .footer__logo { justify-content: center; }
+            .footer__links { align-items: center; }
+            .footer__contact-item {
+                justify-content: center;
+                text-align: left;
+            }
+            .footer__contact-item span { word-break: break-word; }
+            .footer__newsletter-form {
+                width: 100%;
+                max-width: 380px;
+            }
+            .footer__socials { justify-content: center; }
+            .footer__bottom { padding: 20px 0; }
+            .footer__bottom p { font-size: 0.8rem; }
+            .footer__bottom-inner {
+                flex-direction: column;
+                justify-content: center;
+                text-align: center;
+            }
+            .footer__bottom-links { gap: 20px; }
+        }
+
+        /* ================================================================
+           RESPONSIVE – SMALL MOBILE (max-width: 480px)
+           ================================================================ */
+        @media (max-width: 480px) {
+            :root {
+                --container-padding: 0 16px;
+            }
+
+            .hero { padding: 60px 16px 56px; min-height: 210px; }
+            .hero-content h1 { font-size: 1.75rem; }
+
+            .featured-blog-section { padding: 40px 16px 32px; }
+            .section-header h2 { font-size: 1.3rem; }
+            .featured-content { padding: 24px 18px 28px; }
+            .featured-content h3 { font-size: 1.15rem; }
+            .featured-content p { font-size: 0.85rem; }
+
+            .blog-grid-section { padding: 36px 16px 56px; }
+            .blog-grid-section .section-header h2 { font-size: 1.25rem; }
+            .blog-card img { height: 190px; }
+            .blog-card h4 { font-size: 0.98rem; }
+            .blog-card p { font-size: 12.5px; }
+
+            .newsletter-section { padding: 48px 16px; }
+            .newsletter-content h2 { font-size: 1.35rem; }
+
+            /* Popup */
+            .popup__box { padding: 30px 22px 24px; }
+            .popup__icon { width: 58px; height: 58px; }
+            .popup__title { font-size: 1.05rem; }
+            .popup__msg { font-size: 0.85rem; }
+        }
+
+        /* ================================================================
+           EXTRA SMALL (max-width: 360px)
+           ================================================================ */
+        @media (max-width: 360px) {
+            .hero-content h1 { font-size: 1.5rem; }
+            .section-header h2 { font-size: 1.2rem; }
+            .featured-content h3 { font-size: 1.05rem; }
+            .blog-grid-section .section-header h2 { font-size: 1.1rem; }
+            .newsletter-content h2 { font-size: 1.2rem; }
+            .header__nav { width: 88vw; }
+
+            .footer__newsletter-form { flex-direction: column; }
+            .footer__newsletter-btn { padding: 13px 18px; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ================================================================
+         PRELOADER  —  Stackly Nonprofit
+         ================================================================ -->
+    <div class="preloader" id="preloader" role="status" aria-live="polite" aria-label="Loading Stackly Nonprofit">
+        <div class="preloader__inner">
+
+            <div class="preloader__mark">
+                <svg class="preloader__ring" viewBox="0 0 120 120" aria-hidden="true">
+                    <circle class="preloader__ring-track" cx="60" cy="60" r="52"></circle>
+                    <circle class="preloader__ring-progress" id="preRing"
+                            cx="60" cy="60" r="52" pathLength="100"></circle>
+                </svg>
+
+                <svg class="preloader__heart" viewBox="0 0 64 64" aria-hidden="true">
+                    <path class="preloader__heart-path" pathLength="100"
+                          d="M32 56.5C13.4 42 5 32.2 5 22.7 5 13.9 11.7 7 20.2 7c5.1 0 9.3 2.7 11.8 7.3C34.5 9.7 38.7 7 43.8 7 52.3 7 59 13.9 59 22.7c0 9.5-8.4 19.3-27 33.8z"></path>
+                </svg>
+            </div>
+
+            <div class="preloader__brand">Stackly</div>
+            <p class="preloader__tagline">Every Helping Hand, Every Heartfelt Change</p>
+
+            <div class="preloader__progress">
+                <div class="preloader__bar">
+                    <span class="preloader__bar-fill" id="preBarFill"></span>
+                </div>
+                <span class="preloader__pct"><span id="prePct">0</span>%</span>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- ================================================================
+         HEADER / NAVIGATION (matches home page)
+         ================================================================ -->
+    <header class="header" id="header">
+        <div class="container header__container">
+            <a href="index.html" class="header__logo" id="logo">
+                <img src="./images/header_logo.webp" alt="Stackly Logo" class="header__logo-icon" width="38" height="42">
+                <span>Stackly</span>
+            </a>
+            <nav class="header__nav" id="mainNav">
+                <ul class="header__nav-list">
+                    <li><a href="index.html" class="header__nav-link">Home</a></li>
+                    <li><a href="about.html" class="header__nav-link">About Us</a></li>
+                    <li><a href="donation.html" class="header__nav-link">Donation</a></li>
+                    <li><a href="volunteer.html" class="header__nav-link">V. Form</a></li>
+                    <li><a href="blog.html" class="header__nav-link active">Blog</a></li>
+                    <li><a href="contact.html" class="header__nav-link">Contact</a></li>
+                    <!-- Mobile-only Sign Up -->
+                    <li class="header__nav-cta">
+                        <a href="signup.html" class="btn btn--yellow-sm">Sign Up</a>
+                    </li>
+                </ul>
+            </nav>
+            <a href="signup.html" class="btn btn--signup" id="signupBtn">Sign Up</a>
+            <button class="header__hamburger" id="hamburgerBtn" aria-label="Toggle navigation" aria-expanded="false">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+        </div>
+    </header>
+
+    <!-- Mobile nav overlay -->
+    <div class="nav-overlay" id="navOverlay"></div>
+
+    <!-- ================================================================
+         HERO SECTION
+         ================================================================ -->
+    <section class="hero">
+        <img src="./images/left_leaf.webp" alt="Decorative Leaf" class="hero-leaf-left">
+        <img src="./images/rigt_leaf.webp" alt="Decorative Leaf" class="hero-leaf-right">
+
+        <div class="hero-content">
+            <h1>Blog</h1>
+            <p>Home / Blog</p>
+        </div>
+    </section>
+
+    <!-- ================================================================
+         FEATURED BLOG SECTION
+         ================================================================ -->
+    <section class="featured-blog-section">
+        <img src="./images/blog_hand_bag_.webp" alt="Decoration" class="header-decoration">
+
+        <div class="section-header">
+            <h2>Explore Our Most Popular Blogs and Articles!</h2>
+            <p>Discover insights, tips, and stories that our readers love most! Dive into our curated selection of popular blogs and articles, covering topics that inspire, inform, and engage. Whether you're looking to learn something new or simply enjoy a good read, there's something here for everyone.</p>
+        </div>
+
+        <div class="featured-card">
+            <div class="featured-image">
+                <img src="./images/blog_1.webp" alt="Featured Blog">
+            </div>
+            <div class="featured-content">
+                <span class="featured-subtitle">RECENT BLOG</span>
+                <h3>How Small Acts of Kindness Create Big Impacts in Charity</h3>
+                <p>At the heart of our organization is a deep commitment to compassion and community. We believe that every individual deserves respect, support, and the opportunity to thrive. Our mission is to provide inclusive services that cater to the diverse needs of people from all walks of life. Through our various programs, we strive to create lasting change by addressing issues such as hunger, homelessness, education, and healthcare access.</p>
+                <a href="404.html" class="btn-primary-green">Read Now</a>
+
+                <div class="card-bottom-decorations">
+                    <img src="./images/blog_hand_bag_.webp" alt="Gift Icon">
+                    <img src="./images/blog_cup.webp" alt="Cupcake Icon">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ================================================================
+         BLOG GRID SECTION
+         ================================================================ -->
+    <section class="blog-grid-section">
+        <span class="grid-subtitle">MOST POPULAR ARTICLE</span>
+        <h2 class="section-header" style="margin-bottom: 0;">Discover Our Top-Rated Blogs and Must-Read Articles!</h2>
+
+        <div class="blog-grid">
+            <!-- Blog Card 1 (Yellow Button) -->
+            <div class="blog-card">
+                <img src="./images/charity_children_group.webp" alt="Blog Image">
+                <div class="blog-card-content">
+                    <div class="blog-meta">
+                        23 Saturday, 2024 <span class="dot"></span> 4 min
+                    </div>
+                    <h4>Charity's Mission to Educate Underprivileged Children</h4>
+                    <p>With a focus on providing quality education to children in need, this charity is building schools that offer new opportunities for brighter futures.</p>
+                    <a href="404.html" class="btn-card-yellow">Read Now</a>
+                </div>
+            </div>
+
+            <!-- Blog Card 2 (Green Button) -->
+            <div class="blog-card">
+                <img src="./images/charity_community.webp" alt="Blog Image">
+                <div class="blog-card-content">
+                    <div class="blog-meta">
+                        23 Saturday, 2024 <span class="dot"></span> 4 min
+                    </div>
+                    <h4>A Charity's School-Building Initiative for Vulnerable Youth</h4>
+                    <p>Through dedicated efforts, this initiative aims to give underprivileged children a safe space to learn, grow, and achieve their dreams.</p>
+                    <a href="404.html" class="btn-card-green">Read Now</a>
+                </div>
+            </div>
+
+            <!-- Blog Card 3 (Yellow Button) -->
+            <div class="blog-card">
+                <img src="./images/committed-child.webp" alt="Blog Image">
+                <div class="blog-card-content">
+                    <div class="blog-meta">
+                        23 Saturday, 2024 <span class="dot"></span> 4 min
+                    </div>
+                    <h4>Charity Builds Schools to Uplift Communities</h4>
+                    <p>This charity believes every child deserves a quality education. By constructing schools, they're paving the way for lasting community transformation.</p>
+                    <a href="404.html" class="btn-card-yellow">Read Now</a>
+                </div>
+            </div>
+
+            <!-- Blog Card 4 (Green Button) -->
+            <div class="blog-card">
+                <img src="./images/imagesempower3.webp" alt="Blog Image">
+                <div class="blog-card-content">
+                    <div class="blog-meta">
+                        23 Saturday, 2024 <span class="dot"></span> 4 min
+                    </div>
+                    <h4>Charity's Mission to Educate Underprivileged Children</h4>
+                    <p>With a focus on providing quality education to children in need, this charity is building schools that offer new opportunities for brighter futures.</p>
+                    <a href="404.html" class="btn-card-green">Read Now</a>
+                </div>
+            </div>
+
+            <!-- Blog Card 5 (Yellow Button) -->
+            <div class="blog-card">
+                <img src="./images/donation-3.webp" alt="Blog Image">
+                <div class="blog-card-content">
+                    <div class="blog-meta">
+                        23 Saturday, 2024 <span class="dot"></span> 4 min
+                    </div>
+                    <h4>A Charity's School-Building Initiative for Vulnerable Youth</h4>
+                    <p>Through dedicated efforts, this initiative aims to give underprivileged children a safe space to learn, grow, and achieve their dreams.</p>
+                    <a href="404.html" class="btn-card-yellow">Read Now</a>
+                </div>
+            </div>
+
+            <!-- Blog Card 6 (Green Button) -->
+            <div class="blog-card">
+                <img src="./images/DONATION_CAMPING.webp" alt="Blog Image">
+                <div class="blog-card-content">
+                    <div class="blog-meta">
+                        23 Saturday, 2024 <span class="dot"></span> 4 min
+                    </div>
+                    <h4>Charity Builds Schools to Uplift Communities</h4>
+                    <p>This charity believes every child deserves a quality education. By constructing schools, they're paving the way for lasting community transformation.</p>
+                    <a href="404.html" class="btn-card-green">Read Now</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ================================================================
+         NEWSLETTER SECTION
+         ================================================================ -->
+    <section class="newsletter-section">
+        <!-- Decorative Images - Replace src with your own image paths -->
+        <img src="./images/blog_letter.webp" alt="Envelope" class="newsletter-decor newsletter-decor--envelope">
+        <img src="./images/blog_gift.webp" alt="Gift" class="newsletter-decor newsletter-decor--gift">
+        <img src="./images/blog_flowerrr.webp" alt="Flower" class="newsletter-decor newsletter-decor--flower">
+        <img src="./images/blog_jar.webp" alt="Jar" class="newsletter-decor newsletter-decor--jar">
+
+        <!-- Small star decorations -->
+        <img src="your-star-image.png" alt="Star" class="newsletter-decor newsletter-decor--star1">
+        <img src="your-star-image.png" alt="Star" class="newsletter-decor newsletter-decor--star2">
+        <img src="your-star-image.png" alt="Star" class="newsletter-decor newsletter-decor--star3">
+        <img src="your-star-image.png" alt="Star" class="newsletter-decor newsletter-decor--star4">
+
+        <div class="container newsletter-content">
+            <h2>Subscribe to our Newsletter</h2>
+            <p>Subscribe to our newsletter to stay updated with the latest news, exclusive content, and special offers! Join our community and be the first to know about exciting events and opportunities. Don't miss out—sign up today!</p>
+
+            <form class="newsletter-form" id="newsletterSectionForm" novalidate>
+                <input type="email"
+                       id="newsletterSectionEmail"
+                       placeholder="Enter your email address"
+                       class="newsletter-input"
+                       autocomplete="email"
+                       aria-label="Email address"
+                       required>
+                <button type="submit" class="newsletter-btn">Subscribe</button>
+            </form>
+        </div>
+    </section>
+
+    <!-- ================================================================
+         FOOTER
+         ================================================================ -->
+    <footer class="footer">
+        <div class="container footer__grid">
+            <div class="footer__col footer__col--brand">
+                <a href="index.html" class="footer__logo">
+                    <img src="./images/logo.webp" alt="Stackly Logo" class="footer__logo-icon" width="38" height="42">
+                    <span>Stackly</span>
+                </a>
+                <p class="footer__brand-text">
+                    10k<br>
+                    Worldwide Client<br>
+                    Already Connected
+                </p>
+            </div>
+
+            <div class="footer__col">
+                <h4 class="footer__title">Quick Link</h4>
+                <ul class="footer__links">
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="about.html">About Us</a></li>
+                    <li><a href="blog.html">Blog Post</a></li>
+                    <li><a href="donation.html">Donation</a></li>
+                    <li><a href="volunteer.html">V.Form</a></li>
+                    <li><a href="contact.html">Contact</a></li>
+                </ul>
+            </div>
+
+            <div class="footer__col">
+                <h4 class="footer__title">Get In Touch</h4>
+                <ul class="footer__links">
+                    <li><a href="404.html">Contact Us</a></li>
+                    <li><a href="404.html">Our Services</a></li>
+                    <li><a href="404.html">Customer</a></li>
+                    <li><a href="404.html">Client Services</a></li>
+                </ul>
+            </div>
+
+            <div class="footer__col">
+                <h4 class="footer__title">Address</h4>
+                <div class="footer__contact">
+
+                    <a href="https://maps.app.goo.gl/RPcirkD5cH1evV527"
+                       class="footer__contact-item"
+                       target="_blank"
+                       rel="noopener noreferrer"
+                       aria-label="Open our location in Google Maps (opens in a new tab)">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                             stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                            <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
+                            <circle cx="12" cy="10" r="3"/>
+                        </svg>
+                        <span>MMR Complex, Salem,<br>Tamil Nadu 636008</span>
+                    </a>
+
+                    <a href="tel:+918521499999"
+                       class="footer__contact-item"
+                       aria-label="Call us at +91 85214 99999">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                             stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                            <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>
+                        </svg>
+                        <span>+91 85214 99999</span>
+                    </a>
+
+                    <a href="mailto:Stackly@Gmail.Com?subject=Enquiry%20from%20Stackly%20Website"
+                       class="footer__contact-item"
+                       aria-label="Email us at Stackly@Gmail.Com">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                             stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                            <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+                            <polyline points="22,6 12,13 2,6"/>
+                        </svg>
+                        <span>Stackly@Gmail.Com</span>
+                    </a>
+                </div>
+            </div>
+
+            <div class="footer__col footer__col--newsletter">
+                <h4 class="footer__title">Newsletter</h4>
+
+                <form class="footer__newsletter-form" id="newsletterForm" novalidate>
+                    <input type="email"
+                           id="newsletterEmail"
+                           placeholder="Enter Your Email"
+                           class="footer__newsletter-input"
+                           autocomplete="email"
+                           aria-label="Email address">
+                    <button type="submit" class="footer__newsletter-btn" id="newsletterSubmit">Subscribe</button>
+                </form>
+                <p class="footer__newsletter-note">Your email is safe with us, we don't spam.</p>
+
+                <h4 class="footer__social-title">Follow Me</h4>
+                <div class="footer__socials">
+                    <a href="404.html" class="footer__social-icon" aria-label="Twitter">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+                    </a>
+                    <a href="404.html" class="footer__social-icon" aria-label="Instagram">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>
+                    </a>
+                    <a href="404.html" class="footer__social-icon" aria-label="Pinterest">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.373 0 0 5.373 0 12c0 5.084 3.163 9.426 7.627 11.174-.105-.949-.2-2.405.042-3.441.218-.937 1.407-5.965 1.407-5.965s-.359-.719-.359-1.782c0-1.668.967-2.914 2.171-2.914 1.023 0 1.518.769 1.518 1.69 0 1.029-.655 2.568-.994 3.995-.283 1.194.599 2.169 1.777 2.169 2.133 0 3.772-2.249 3.772-5.495 0-2.873-2.064-4.882-5.012-4.882-3.414 0-5.418 2.561-5.418 5.207 0 1.031.397 2.138.893 2.738.098.119.112.224.083.345l-.333 1.36c-.053.22-.174.267-.402.161-1.499-.698-2.436-2.889-2.436-4.649 0-3.785 2.75-7.262 7.929-7.262 4.163 0 7.398 2.966 7.398 6.931 0 4.136-2.607 7.464-6.227 7.464-1.216 0-2.359-.631-2.75-1.378l-.748 2.853c-.271 1.043-1.002 2.35-1.492 3.146C9.57 23.812 10.763 24 12 24c6.627 0 12-5.373 12-12S18.627 0 12 0z"/></svg>
+                    </a>
+                    <a href="404.html" class="footer__social-icon" aria-label="YouTube">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer__bottom">
+            <div class="container footer__bottom-inner">
+                <p>&copy; 2026 Stackly Nonprofit Charity ( NGO &amp; Nonprofit). All rights reserved.</p>
+                <div class="footer__bottom-links">
+                    <a href="404.html">Privacy Policy</a>
+                    <a href="404.html">Terms of Service</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- ================================================================
+         NEWSLETTER POPUP
+         ================================================================ -->
+    <div class="popup" id="newsletterPopup" role="dialog" aria-modal="true"
+         aria-labelledby="popupTitle" aria-describedby="popupMsg" aria-hidden="true">
+        <div class="popup__overlay" data-popup-close></div>
+
+        <div class="popup__box">
+            <button type="button" class="popup__close" data-popup-close aria-label="Close popup">&times;</button>
+
+            <div class="popup__icon" id="popupIcon"></div>
+            <h3 class="popup__title" id="popupTitle"></h3>
+            <p class="popup__msg" id="popupMsg"></p>
+            <button type="button" class="popup__btn" data-popup-close>OK</button>
+        </div>
+    </div>
+
+    <!-- ================================================================
+         JAVASCRIPT
+         ================================================================ -->
+    <script>
+    (function () {
+        'use strict';
+
+        /* ------------------------------------------------------------
+           0. PRELOADER  —  always finishes in under 3 seconds
+        ------------------------------------------------------------ */
+        (function initPreloader() {
+            var preloader = document.getElementById('preloader');
+            if (!preloader) return;
+
+            var ring    = document.getElementById('preRing');
+            var barFill = document.getElementById('preBarFill');
+            var pctEl   = document.getElementById('prePct');
+
+            var HOLD_MAX  = 1500;   /* max ms of the "loading" ramp   */
+            var FILL_TIME = 500;    /* ms for the final sweep to 100% */
+            var FADE_TIME = 450;    /* ms for the overlay to fade out */
+            var CEILING   = 92;     /* progress cap while ramping     */
+
+            var currentPct  = 0;
+            var startTime   = Date.now();
+            var isReady     = false;
+            var isFinishing = false;
+            var isHidden    = false;
+
+            document.body.classList.add('preloader-active');
+
+            function setProgress(p) {
+                p = Math.max(0, Math.min(100, p));
+                currentPct = p;
+
+                if (ring)    ring.style.strokeDashoffset = String(100 - p);
+                if (barFill) barFill.style.width = p + '%';
+                if (pctEl)   pctEl.textContent = Math.round(p);
+            }
+
+            setProgress(0);
+
+            function hidePreloader() {
+                if (isHidden) return;
+                isHidden = true;
+
+                preloader.classList.add('preloader--done');
+                document.body.classList.remove('preloader-active');
+
+                window.setTimeout(function () {
+                    if (preloader && preloader.parentNode) {
+                        preloader.parentNode.removeChild(preloader);
+                    }
+                }, FADE_TIME + 80);
+            }
+
+            function finish() {
+                if (isFinishing || isHidden) return;
+                isFinishing = true;
+
+                var from = currentPct;
+                var t0 = Date.now();
+
+                function step() {
+                    var t = Math.min((Date.now() - t0) / FILL_TIME, 1);
+                    var eased = 1 - Math.pow(1 - t, 2);
+                    setProgress(from + (100 - from) * eased);
+
+                    if (t < 1) {
+                        requestAnimationFrame(step);
+                    } else {
+                        setProgress(100);
+                        window.setTimeout(hidePreloader, 130);
+                    }
+                }
+
+                requestAnimationFrame(step);
+            }
+
+            function ramp() {
+                if (isHidden || isFinishing) return;
+
+                if (isReady) { finish(); return; }
+
+                var elapsed = Date.now() - startTime;
+                var t = Math.min(elapsed / HOLD_MAX, 1);
+                var eased = 1 - Math.pow(1 - t, 2.4);
+
+                setProgress(eased * CEILING);
+
+                if (elapsed >= HOLD_MAX) { finish(); return; }
+
+                requestAnimationFrame(ramp);
+            }
+
+            function markReady() {
+                if (isReady || isFinishing || isHidden) return;
+                isReady = true;
+
+                /* Small courtesy pause so a fast load doesn't flash */
+                var elapsed = Date.now() - startTime;
+                var wait = Math.max(0, 650 - elapsed);
+                window.setTimeout(finish, wait);
+            }
+
+            if (document.readyState === 'complete') {
+                markReady();
+            } else {
+                window.addEventListener('load', markReady);
+                /* Safety net — never let the preloader hang */
+                window.setTimeout(markReady, HOLD_MAX + 150);
+            }
+
+            requestAnimationFrame(ramp);
+        })();
+
+
+        /* ------------------------------------------------------------
+           1. HEADER — shadow on scroll
+        ------------------------------------------------------------ */
+        var header = document.getElementById('header');
+
+        function handleHeaderScroll() {
+            if (window.scrollY > 40) {
+                header.classList.add('scrolled');
+            } else {
+                header.classList.remove('scrolled');
+            }
+        }
+
+        window.addEventListener('scroll', handleHeaderScroll, { passive: true });
+        handleHeaderScroll();
+
+
+        /* ------------------------------------------------------------
+           2. MOBILE NAVIGATION — hamburger + overlay
+        ------------------------------------------------------------ */
+        var hamburgerBtn = document.getElementById('hamburgerBtn');
+        var mainNav      = document.getElementById('mainNav');
+        var navOverlay   = document.getElementById('navOverlay');
+
+        function openNav() {
+            mainNav.classList.add('open');
+            hamburgerBtn.classList.add('active');
+            navOverlay.classList.add('active');
+            document.body.classList.add('nav-open');
+            hamburgerBtn.setAttribute('aria-expanded', 'true');
+        }
+
+        function closeNav() {
+            mainNav.classList.remove('open');
+            hamburgerBtn.classList.remove('active');
+            navOverlay.classList.remove('active');
+            document.body.classList.remove('nav-open');
+            hamburgerBtn.setAttribute('aria-expanded', 'false');
+        }
+
+        function toggleNav() {
+            if (mainNav.classList.contains('open')) {
+                closeNav();
+            } else {
+                openNav();
+            }
+        }
+
+        hamburgerBtn.addEventListener('click', toggleNav);
+        navOverlay.addEventListener('click', closeNav);
+
+        mainNav.querySelectorAll('a').forEach(function (link) {
+            link.addEventListener('click', closeNav);
+        });
+
+        document.addEventListener('keydown', function (e) {
+            if (e.key === 'Escape' && mainNav.classList.contains('open')) {
+                closeNav();
+            }
+        });
+
+        window.addEventListener('resize', function () {
+            if (window.innerWidth > 768) {
+                closeNav();
+            }
+        });
+
+
+        /* ------------------------------------------------------------
+           3. IMAGE FALLBACKS
+        ------------------------------------------------------------ */
+        document.querySelectorAll('img').forEach(function (img) {
+            img.addEventListener('error', function () {
+                this.style.opacity = '0';
+            });
+        });
+
+
+        /* ------------------------------------------------------------
+           4. NEWSLETTER — Gmail-only validation + popup message
+        ------------------------------------------------------------ */
+        var newsletterForm  = document.getElementById('newsletterForm');
+        var newsletterEmail = document.getElementById('newsletterEmail');
+        var popup           = document.getElementById('newsletterPopup');
+        var popupIcon       = document.getElementById('popupIcon');
+        var popupTitle      = document.getElementById('popupTitle');
+        var popupMsg        = document.getElementById('popupMsg');
+
+        /* Only letters, numbers and . _ % + - before @gmail.com */
+        var GMAIL_REGEX = /^[a-zA-Z0-9._%+-]+@gmail\.com$/;
+
+        var ICON_SUCCESS =
+            '<svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" ' +
+            'stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">' +
+            '<path d="M20 6L9 17l-5-5"/></svg>';
+
+        var ICON_ERROR =
+            '<svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" ' +
+            'stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">' +
+            '<circle cx="12" cy="12" r="10"/><path d="M12 8v5"/><path d="M12 16.5h.01"/></svg>';
+
+        var lastFocusedEl = null;
+
+        function showPopup(type, title, message) {
+            if (!popup) return;
+
+            popupIcon.className = 'popup__icon popup__icon--' + type;
+            popupIcon.innerHTML = (type === 'success') ? ICON_SUCCESS : ICON_ERROR;
+            popupTitle.textContent = title;
+            popupMsg.textContent = message;
+
+            lastFocusedEl = document.activeElement;
+
+            popup.classList.add('active');
+            popup.setAttribute('aria-hidden', 'false');
+            document.body.classList.add('popup-open');
+
+            var okBtn = popup.querySelector('.popup__btn');
+            if (okBtn) {
+                setTimeout(function () { okBtn.focus(); }, 60);
+            }
+        }
+
+        function hidePopup() {
+            if (!popup || !popup.classList.contains('active')) return;
+
+            popup.classList.remove('active');
+            popup.setAttribute('aria-hidden', 'true');
+            document.body.classList.remove('popup-open');
+
+            if (lastFocusedEl && typeof lastFocusedEl.focus === 'function') {
+                lastFocusedEl.focus();
+            }
+        }
+
+        if (popup) {
+            popup.querySelectorAll('[data-popup-close]').forEach(function (el) {
+                el.addEventListener('click', hidePopup);
+            });
+
+            document.addEventListener('keydown', function (e) {
+                if (e.key === 'Escape') hidePopup();
+            });
+        }
+
+        function markInvalid(input) {
+            input.classList.add('input-error', 'shake');
+            setTimeout(function () {
+                input.classList.remove('shake');
+            }, 450);
+            input.focus();
+        }
+
+        function clearInvalid(input) {
+            input.classList.remove('input-error', 'shake');
+        }
+
+        /* ---- Footer newsletter form ---- */
+        if (newsletterForm && newsletterEmail) {
+
+            newsletterEmail.addEventListener('input', function () {
+                clearInvalid(newsletterEmail);
+            });
+
+            newsletterForm.addEventListener('submit', function (e) {
+                e.preventDefault();
+
+                var value = newsletterEmail.value.trim();
+
+                if (value === '') {
+                    markInvalid(newsletterEmail);
+                    showPopup(
+                        'error',
+                        'Email Required',
+                        'Please enter your email address before subscribing.'
+                    );
+                    return;
+                }
+
+                if (!GMAIL_REGEX.test(value)) {
+                    markInvalid(newsletterEmail);
+                    showPopup(
+                        'error',
+                        'Invalid Email Address',
+                        'Only Gmail addresses are accepted. Your email must end with "@gmail.com" — for example: yourname@gmail.com'
+                    );
+                    return;
+                }
+
+                clearInvalid(newsletterEmail);
+                showPopup(
+                    'success',
+                    'Subscribed Successfully!',
+                    'Thank you for subscribing with ' + value +
+                    '. You will now receive our latest updates and stories.'
+                );
+
+                newsletterForm.reset();
+            });
+        }
+
+
+        /* ------------------------------------------------------------
+           5. NEWSLETTER SECTION (mid-page) — Gmail-only validation
+        ------------------------------------------------------------ */
+        var sectionForm  = document.getElementById('newsletterSectionForm');
+        var sectionEmail = document.getElementById('newsletterSectionEmail');
+
+        if (sectionForm && sectionEmail) {
+
+            sectionEmail.addEventListener('input', function () {
+                clearInvalid(sectionEmail);
+            });
+
+            sectionForm.addEventListener('submit', function (e) {
+                e.preventDefault();
+
+                var value = sectionEmail.value.trim();
+
+                if (value === '') {
+                    markInvalid(sectionEmail);
+                    showPopup(
+                        'error',
+                        'Email Required',
+                        'Please enter your email address before subscribing.'
+                    );
+                    return;
+                }
+
+                if (!GMAIL_REGEX.test(value)) {
+                    markInvalid(sectionEmail);
+                    showPopup(
+                        'error',
+                        'Invalid Email Address',
+                        'Only Gmail addresses are accepted. Your email must end with "@gmail.com" — for example: yourname@gmail.com'
+                    );
+                    return;
+                }
+
+                clearInvalid(sectionEmail);
+                showPopup(
+                    'success',
+                    'Subscribed Successfully!',
+                    'Thank you for subscribing with ' + value +
+                    '. You will now receive our latest updates and stories.'
+                );
+
+                sectionForm.reset();
+            });
+        }
+
+    })();
+    </script>
+
+</body>
+</html>

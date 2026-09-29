@@ -1,0 +1,2351 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Staff Dashboard — Stackly Charity</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #14532d;
+            --primary-light: #2d6a4f;
+            --accent: #d4af37;
+            --accent-hover: #b8941f;
+            --bg: #f2f6f3;
+            --surface: #ffffff;
+            --text: #1a202c;
+            --text-muted: #718096;
+            --border: #e2e8f0;
+            --success: #38a169;
+            --warning: #d69e2e;
+            --error: #e53e3e;
+            --info: #3182ce;
+            --shadow: 0 4px 20px rgba(20, 83, 45, 0.08);
+            --radius: 14px;
+            --sidebar-width: 264px;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        html { -webkit-text-size-adjust: 100%; }
+
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* ========== SIDEBAR ========== */
+        .sidebar {
+            position: fixed;
+            left: 0; top: 0; bottom: 0;
+            width: var(--sidebar-width);
+            background: var(--primary);
+            color: #fff;
+            z-index: 100;
+            display: flex;
+            flex-direction: column;
+            transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 4px 0 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .sidebar-header {
+            padding: 22px 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+        .sidebar-header .logo-img {
+            height: 46px;
+            width: auto;
+            max-width: 100%;
+            object-fit: contain;
+            display: block;
+        }
+
+        .nav-menu {
+            flex: 1;
+            padding: 14px 12px;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .nav-section { margin-bottom: 6px; }
+
+        .nav-section-label {
+            font-size: 0.68rem;
+            text-transform: uppercase;
+            letter-spacing: 1.2px;
+            color: rgba(255, 255, 255, 0.35);
+            padding: 14px 16px 6px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            cursor: pointer;
+            user-select: none;
+            transition: color 0.2s;
+        }
+        .nav-section-label:hover { color: rgba(255, 255, 255, 0.6); }
+        .nav-section-label .toggle-icon { font-size: 0.7rem; transition: transform 0.3s; }
+        .nav-section.collapsed .nav-items-container { display: none; }
+        .nav-section.collapsed .toggle-icon { transform: rotate(-90deg); }
+
+        .nav-items-container { display: flex; flex-direction: column; gap: 2px; }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 11px 16px;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            color: rgba(255, 255, 255, 0.75);
+            font-size: 0.9rem;
+            font-weight: 500;
+            border: none;
+            background: none;
+            width: 100%;
+            text-align: left;
+            position: relative;
+            text-decoration: none;
+            font-family: inherit;
+        }
+        .nav-item:hover { background: rgba(255, 255, 255, 0.08); color: #fff; }
+        .nav-item.active { background: rgba(212, 175, 55, 0.16); color: var(--accent); }
+        .nav-item i { width: 22px; text-align: center; font-size: 1rem; }
+        .nav-item .nav-badge {
+            margin-left: auto;
+            background: var(--error);
+            color: #fff;
+            font-size: 0.65rem;
+            font-weight: 700;
+            padding: 2px 8px;
+            border-radius: 10px;
+            min-width: 20px;
+            text-align: center;
+            line-height: 1.4;
+        }
+        .nav-item .nav-badge.neutral { background: rgba(255, 255, 255, 0.2); color: #fff; }
+
+        .sidebar-footer {
+            padding: 14px 16px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            flex-shrink: 0;
+        }
+        .user-mini {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+        }
+        .user-mini-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: var(--accent);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 0.85rem;
+            color: var(--primary);
+            flex-shrink: 0;
+        }
+        .user-mini-info { flex: 1; min-width: 0; overflow: hidden; }
+        .user-mini-name {
+            font-size: 0.85rem;
+            font-weight: 600;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .user-mini-role {
+            font-size: 0.7rem;
+            color: rgba(255, 255, 255, 0.5);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .sidebar-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 99;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+        .sidebar-overlay.show { opacity: 1; visibility: visible; }
+
+        /* ========== LAYOUT ========== */
+        .main-content {
+            margin-left: var(--sidebar-width);
+            min-height: 100vh;
+            transition: margin-left 0.35s ease;
+        }
+
+        .top-header {
+            background: var(--surface);
+            padding: 16px 28px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            border-bottom: 1px solid var(--border);
+            position: sticky;
+            top: 0;
+            z-index: 50;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.03);
+        }
+        .header-left { display: flex; align-items: center; gap: 14px; min-width: 0; }
+        .menu-toggle {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 1.3rem;
+            color: var(--primary);
+            cursor: pointer;
+            padding: 6px 8px;
+            border-radius: 8px;
+            flex-shrink: 0;
+        }
+        .menu-toggle:hover { background: var(--bg); }
+        .header-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--primary);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .header-title span { color: var(--text-muted); font-weight: 400; font-size: 0.9rem; }
+        .header-right { display: flex; align-items: center; gap: 12px; flex-shrink: 0; }
+        .header-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            border: 1px solid var(--border);
+            background: var(--surface);
+            color: var(--text-muted);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+            position: relative;
+            transition: all 0.2s;
+            flex-shrink: 0;
+        }
+        .header-btn:hover { background: var(--bg); color: var(--primary); border-color: var(--primary-light); }
+        .header-btn .badge {
+            position: absolute;
+            top: -2px;
+            right: -2px;
+            width: 18px;
+            height: 18px;
+            background: var(--error);
+            color: #fff;
+            font-size: 0.65rem;
+            font-weight: 700;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 2px solid var(--surface);
+        }
+        .header-profile {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+            padding: 6px 10px;
+            border-radius: 10px;
+            transition: background 0.2s;
+        }
+        .header-profile:hover { background: var(--bg); }
+        .header-profile-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: var(--primary);
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 0.85rem;
+            flex-shrink: 0;
+        }
+        .header-profile-info { line-height: 1.2; }
+        .header-profile-name { font-size: 0.9rem; font-weight: 600; color: var(--text); }
+        .header-profile-role { font-size: 0.75rem; color: var(--text-muted); }
+
+        .page-content {
+            padding: 24px 28px 48px;
+            max-width: 1400px;
+        }
+
+        /* ========== STATS ========== */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+            margin-bottom: 24px;
+        }
+        .stat-card {
+            background: var(--surface);
+            border-radius: var(--radius);
+            padding: 20px;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border);
+            display: flex;
+            align-items: flex-start;
+            gap: 14px;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .stat-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px rgba(20, 83, 45, 0.12);
+        }
+        .stat-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.3rem;
+            flex-shrink: 0;
+        }
+        .stat-icon.green { background: rgba(56, 161, 105, 0.12); color: var(--success); }
+        .stat-icon.blue { background: rgba(49, 130, 206, 0.1); color: var(--info); }
+        .stat-icon.amber { background: rgba(214, 158, 46, 0.12); color: var(--warning); }
+        .stat-icon.red { background: rgba(229, 62, 62, 0.1); color: var(--error); }
+        .stat-icon.purple { background: rgba(128, 90, 213, 0.1); color: #805ad5; }
+        .stat-icon.teal { background: rgba(49, 151, 149, 0.1); color: #319795; }
+
+        .stat-info { min-width: 0; }
+        .stat-info h3 {
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: var(--primary);
+            margin-bottom: 2px;
+            word-break: break-word;
+            line-height: 1.15;
+        }
+        .stat-info p { font-size: 0.85rem; color: var(--text-muted); font-weight: 500; }
+
+        /* ========== CARDS ========== */
+        .section-card {
+            background: var(--surface);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border);
+            margin-bottom: 24px;
+            overflow: hidden;
+        }
+        .section-header {
+            padding: 18px 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            border-bottom: 1px solid var(--border);
+            flex-wrap: wrap;
+        }
+        .section-title {
+            font-size: 1.05rem;
+            font-weight: 700;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .section-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+        .section-body { padding: 20px 24px; }
+
+        /* ========== BUTTONS ========== */
+        .btn {
+            padding: 10px 18px;
+            border-radius: 10px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            border: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s;
+            font-family: inherit;
+            white-space: nowrap;
+        }
+        .btn-primary { background: var(--primary); color: #fff; }
+        .btn-primary:hover { background: var(--primary-light); transform: translateY(-1px); box-shadow: 0 4px 12px rgba(20, 83, 45, 0.25); }
+        .btn-outline { background: transparent; color: var(--primary); border: 1.5px solid var(--border); }
+        .btn-outline:hover { background: var(--bg); border-color: var(--primary-light); }
+        .btn-accent { background: var(--accent); color: #3a2c00; }
+        .btn-accent:hover { background: var(--accent-hover); color: #fff; transform: translateY(-1px); box-shadow: 0 4px 12px rgba(212, 175, 55, 0.3); }
+        .btn-danger { background: transparent; color: var(--error); border: 1.5px solid var(--error); }
+        .btn-danger:hover { background: rgba(229, 62, 62, 0.06); }
+        .btn-sm { padding: 8px 14px; font-size: 0.85rem; }
+        .btn-block { width: 100%; justify-content: center; }
+
+        /* ========== TOOLBAR ========== */
+        .toolbar { display: flex; gap: 12px; margin-bottom: 20px; flex-wrap: wrap; }
+        .search-box { flex: 1; min-width: 220px; position: relative; }
+        .search-box input {
+            width: 100%;
+            padding: 10px 14px 10px 40px;
+            border: 1.5px solid var(--border);
+            border-radius: 10px;
+            font-size: 0.9rem;
+            background: var(--bg);
+            transition: all 0.2s;
+            font-family: inherit;
+        }
+        .search-box input:focus {
+            outline: none;
+            border-color: var(--primary-light);
+            background: #fff;
+            box-shadow: 0 0 0 3px rgba(20, 83, 45, 0.08);
+        }
+        .search-box i {
+            position: absolute;
+            left: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+        .filter-select {
+            padding: 10px 14px;
+            border: 1.5px solid var(--border);
+            border-radius: 10px;
+            font-size: 0.9rem;
+            background: var(--bg);
+            color: var(--text);
+            cursor: pointer;
+            font-family: inherit;
+            min-width: 150px;
+        }
+        .filter-select:focus { outline: none; border-color: var(--primary-light); }
+
+        /* ========== TABLES ========== */
+        .table-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+        .doc-table, .billing-table { width: 100%; border-collapse: collapse; }
+        .doc-table th, .billing-table th {
+            text-align: left;
+            padding: 12px 16px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--text-muted);
+            border-bottom: 2px solid var(--border);
+            white-space: nowrap;
+        }
+        .doc-table td, .billing-table td {
+            padding: 14px 16px;
+            font-size: 0.9rem;
+            border-bottom: 1px solid var(--border);
+            vertical-align: middle;
+        }
+        .doc-table tr:hover td, .billing-table tr:hover td { background: rgba(20, 83, 45, 0.02); }
+        .doc-table tr:last-child td, .billing-table tr:last-child td { border-bottom: none; }
+
+        .doc-name { display: flex; align-items: center; gap: 10px; }
+        .doc-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            background: rgba(20, 83, 45, 0.07);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--primary);
+            font-size: 0.9rem;
+            flex-shrink: 0;
+        }
+
+        /* ========== BADGES ========== */
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.78rem;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+        .status-badge::before { content: ''; width: 6px; height: 6px; border-radius: 50%; }
+        .status-completed, .status-approved, .status-active, .status-issued, .status-paid, .status-verified, .status-low {
+            background: rgba(56, 161, 105, 0.1); color: var(--success);
+        }
+        .status-completed::before, .status-approved::before, .status-active::before,
+        .status-issued::before, .status-paid::before, .status-verified::before, .status-low::before { background: var(--success); }
+        .status-pending, .status-processing, .status-medium {
+            background: rgba(214, 158, 46, 0.12); color: #b7791f;
+        }
+        .status-pending::before, .status-processing::before, .status-medium::before { background: var(--warning); }
+        .status-review, .status-inprogress, .status-ongoing {
+            background: rgba(49, 130, 206, 0.1); color: var(--info);
+        }
+        .status-review::before, .status-inprogress::before, .status-ongoing::before { background: var(--info); }
+        .status-failed, .status-rejected, .status-paused, .status-overdue, .status-high, .status-urgent {
+            background: rgba(229, 62, 62, 0.1); color: var(--error);
+        }
+        .status-failed::before, .status-rejected::before, .status-paused::before,
+        .status-overdue::before, .status-high::before, .status-urgent::before { background: var(--error); }
+        .status-closed, .status-draft { background: rgba(113, 128, 150, 0.12); color: var(--text-muted); }
+        .status-closed::before, .status-draft::before { background: var(--text-muted); }
+        .status-submitted { background: rgba(128, 90, 213, 0.1); color: #805ad5; }
+        .status-submitted::before { background: #805ad5; }
+
+        /* ========== ACTION BUTTONS ========== */
+        .action-btns { display: flex; gap: 6px; justify-content: flex-end; }
+        .action-btn {
+            width: 34px;
+            height: 34px;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            background: var(--surface);
+            color: var(--text-muted);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.85rem;
+            transition: all 0.2s;
+            flex-shrink: 0;
+        }
+        .action-btn:hover { background: var(--primary); color: #fff; border-color: var(--primary); }
+
+        /* ========== PROGRAM / TASK CARDS ========== */
+        .task-cards-grid, .program-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 16px;
+        }
+        .program-card {
+            background: var(--bg);
+            border-radius: 12px;
+            padding: 18px;
+            border: 1px solid var(--border);
+            transition: all 0.2s;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        .program-card:hover { border-color: var(--primary-light); box-shadow: 0 4px 16px rgba(20, 83, 45, 0.08); }
+        .program-top { display: flex; align-items: flex-start; gap: 12px; }
+        .program-icon {
+            width: 44px;
+            height: 44px;
+            border-radius: 12px;
+            background: rgba(212, 175, 55, 0.15);
+            color: #8a6d09;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+            flex-shrink: 0;
+        }
+        .program-head { flex: 1; min-width: 0; }
+        .program-name { font-weight: 700; font-size: 0.98rem; color: var(--primary); line-height: 1.25; }
+        .program-cat { font-size: 0.76rem; color: var(--text-muted); margin-top: 2px; }
+        .program-desc { font-size: 0.85rem; color: var(--text-muted); line-height: 1.5; }
+        .progress-track { height: 8px; background: var(--border); border-radius: 99px; overflow: hidden; }
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary-light), var(--accent));
+            border-radius: 99px;
+            transition: width 0.6s ease;
+        }
+        .program-stats {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--primary);
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+        .program-meta {
+            display: flex;
+            gap: 14px;
+            font-size: 0.78rem;
+            color: var(--text-muted);
+            flex-wrap: wrap;
+        }
+        .program-meta span { display: flex; align-items: center; gap: 5px; }
+
+        /* Task cards */
+        .task-card {
+            background: var(--bg);
+            border-radius: 12px;
+            padding: 18px;
+            border: 1px solid var(--border);
+            transition: all 0.2s;
+            cursor: pointer;
+        }
+        .task-card:hover { border-color: var(--primary-light); box-shadow: 0 4px 16px rgba(20, 83, 45, 0.08); }
+        .task-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 10px;
+            margin-bottom: 12px;
+        }
+        .task-card-title { font-weight: 600; font-size: 1rem; margin-bottom: 4px; color: var(--text); }
+        .task-card-meta {
+            display: flex;
+            gap: 16px;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            flex-wrap: wrap;
+            margin-top: 8px;
+        }
+        .task-card-meta span { display: flex; align-items: center; gap: 5px; }
+        .task-card-due { font-weight: 700; font-size: 0.85rem; margin-top: 8px; }
+        .task-card-due.overdue { color: var(--error); }
+        .task-card-due.upcoming { color: var(--warning); }
+        .task-card-due.done { color: var(--success); }
+
+        /* ========== ACTIVITY / MESSAGES ========== */
+        .activity-list { display: flex; flex-direction: column; gap: 14px; }
+        .activity-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 14px;
+            padding: 14px;
+            border-radius: 10px;
+            background: var(--bg);
+            transition: background 0.2s;
+        }
+        .activity-item:hover { background: rgba(20, 83, 45, 0.05); }
+        .activity-icon {
+            width: 38px;
+            height: 38px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.9rem;
+            flex-shrink: 0;
+            background: rgba(20, 83, 45, 0.06);
+        }
+        .activity-content { flex: 1; min-width: 0; }
+        .activity-text { font-size: 0.9rem; color: var(--text); line-height: 1.4; }
+        .activity-text strong { color: var(--primary); }
+        .activity-time { font-size: 0.8rem; color: var(--text-muted); margin-top: 4px; }
+
+        .message-item {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 14px 16px;
+            border-radius: 10px;
+            background: var(--bg);
+            border: 1px solid var(--border);
+            margin-bottom: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .message-item:hover { border-color: var(--primary-light); background: #fff; }
+        .message-item.unread { border-left: 3px solid var(--accent); background: rgba(212, 175, 55, 0.05); }
+        .message-avatar {
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 0.9rem;
+            color: #fff;
+        }
+        .message-content { flex: 1; min-width: 0; }
+        .message-sender { font-weight: 600; font-size: 0.9rem; color: var(--primary); }
+        .message-preview {
+            font-size: 0.82rem;
+            color: var(--text-muted);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .message-time { font-size: 0.75rem; color: var(--text-muted); white-space: nowrap; }
+
+        /* ========== APPOINTMENT / VISIT ITEMS ========== */
+        .appointment-item {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            padding: 16px;
+            border-radius: 12px;
+            background: var(--bg);
+            border: 1px solid var(--border);
+            margin-bottom: 10px;
+            transition: all 0.2s;
+        }
+        .appointment-item:hover { border-color: var(--primary-light); box-shadow: 0 2px 8px rgba(20, 83, 45, 0.05); }
+        .appointment-date-box {
+            width: 54px;
+            height: 54px;
+            border-radius: 10px;
+            background: var(--primary);
+            color: #fff;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            font-weight: 700;
+            line-height: 1.1;
+        }
+        .appointment-date-box .day { font-size: 1.2rem; }
+        .appointment-date-box .month { font-size: 0.68rem; text-transform: uppercase; opacity: 0.85; }
+        .appointment-info { flex: 1; min-width: 0; }
+        .appointment-info h4 { font-size: 0.95rem; font-weight: 600; color: var(--primary); margin-bottom: 3px; }
+        .appointment-info p { font-size: 0.83rem; color: var(--text-muted); line-height: 1.5; }
+
+        /* ========== FORM ========== */
+        .form-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
+        .form-group { display: flex; flex-direction: column; gap: 6px; }
+        .form-group.full { grid-column: 1 / -1; }
+        .form-group label {
+            font-size: 0.78rem;
+            font-weight: 700;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            padding: 12px 14px;
+            border: 1.5px solid var(--border);
+            border-radius: 10px;
+            font-size: 0.95rem;
+            background: var(--bg);
+            font-family: inherit;
+            transition: all 0.2s;
+            width: 100%;
+        }
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: var(--primary-light);
+            background: #fff;
+            box-shadow: 0 0 0 3px rgba(20, 83, 45, 0.08);
+        }
+        .form-group input:disabled { background: #e2e8f0; color: var(--text-muted); cursor: not-allowed; }
+
+        /* ========== PROFILE ========== */
+        .profile-header { display: flex; align-items: center; gap: 20px; margin-bottom: 24px; }
+        .profile-avatar-large {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: var(--primary);
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            font-weight: 700;
+            border: 4px solid var(--accent);
+            flex-shrink: 0;
+        }
+        .profile-header-info h2 { font-size: 1.35rem; color: var(--primary); margin-bottom: 4px; }
+        .profile-header-info p { color: var(--text-muted); font-size: 0.9rem; }
+
+        /* ========== PASSWORD FIELD WITH EYE TOGGLE ========== */
+        .password-wrapper {
+            position: relative;
+            display: block;
+            width: 100%;
+        }
+        .password-wrapper input {
+            display: block;
+            padding-right: 46px !important;   /* room for the eye icon */
+        }
+        .password-wrapper .toggle-password {
+            position: absolute;
+            top: 0;
+            right: 0;
+            bottom: 0;
+            width: 44px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: transparent;
+            border: none;
+            padding: 0;
+            margin: 0;
+            color: var(--text-muted);
+            font-size: 0.95rem;
+            line-height: 1;
+            cursor: pointer;
+            z-index: 2;
+            transition: color 0.2s;
+        }
+        .password-wrapper .toggle-password:hover { color: var(--primary); }
+        .password-wrapper .toggle-password:focus { outline: none; }
+
+        /* Hide the browser-native reveal/clear buttons (Edge, IE) so they
+           do NOT overlap with our custom eye icon */
+        input[type="password"]::-ms-reveal,
+        input[type="password"]::-ms-clear {
+            display: none !important;
+            width: 0;
+            height: 0;
+        }
+        input[type="password"]::-webkit-credentials-auto-fill-button,
+        input[type="password"]::-webkit-textfield-decoration-container {
+            display: none !important;
+            visibility: hidden;
+            pointer-events: none;
+        }
+
+        /* ========== UPLOAD ZONE ========== */
+        .upload-zone {
+            border: 2px dashed var(--border);
+            border-radius: var(--radius);
+            padding: 40px 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            background: var(--bg);
+        }
+        .upload-zone:hover, .upload-zone.dragover {
+            border-color: var(--accent);
+            background: rgba(212, 175, 55, 0.04);
+        }
+        .upload-zone i { font-size: 2.5rem; color: var(--accent); margin-bottom: 12px; }
+        .upload-zone h4 { font-size: 1rem; color: var(--primary); margin-bottom: 6px; }
+        .upload-zone p { font-size: 0.85rem; color: var(--text-muted); }
+
+        /* ========== FAQ ========== */
+        .faq-item {
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            margin-bottom: 8px;
+            overflow: hidden;
+            transition: all 0.2s;
+            background: var(--bg);
+        }
+        .faq-question {
+            padding: 16px 18px;
+            font-weight: 600;
+            font-size: 0.92rem;
+            color: var(--primary);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            user-select: none;
+        }
+        .faq-question:hover { background: rgba(20, 83, 45, 0.03); }
+        .faq-answer {
+            padding: 0 18px 16px;
+            font-size: 0.88rem;
+            color: var(--text-muted);
+            line-height: 1.6;
+            display: none;
+        }
+        .faq-item.open .faq-answer { display: block; }
+        .faq-item.open { border-color: var(--primary-light); background: #fff; }
+        .faq-item.open .faq-question { color: var(--accent-hover); }
+
+        /* ========== EMPTY STATE ========== */
+        .empty-state { text-align: center; padding: 40px 20px; color: var(--text-muted); }
+        .empty-state i { font-size: 3rem; margin-bottom: 12px; opacity: 0.45; }
+        .empty-state h4 { color: var(--primary); margin-bottom: 6px; font-size: 1rem; }
+        .empty-state p { font-size: 0.88rem; }
+
+        /* ========== TOAST ========== */
+        #toast {
+            position: fixed;
+            top: 24px;
+            right: 24px;
+            background: var(--surface);
+            border-radius: 12px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+            padding: 16px 20px;
+            display: flex;
+            align-items: flex-start;
+            gap: 14px;
+            min-width: 300px;
+            max-width: 400px;
+            z-index: 10000;
+            transform: translateX(150%);
+            transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+            border-left: 4px solid var(--primary);
+        }
+        #toast.show { transform: translateX(0); }
+        #toast.success { border-left-color: var(--success); }
+        #toast.error { border-left-color: var(--error); }
+        .toast-icon { font-size: 1.3rem; flex-shrink: 0; margin-top: 2px; }
+        .toast-content h4 { font-size: 0.95rem; font-weight: 700; margin-bottom: 2px; color: var(--text); }
+        .toast-content p { font-size: 0.85rem; color: var(--text-muted); line-height: 1.4; }
+
+        /* ========== ANIMATION ========== */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-in { animation: fadeIn 0.4s ease forwards; }
+
+        .view-section { display: none; }
+        .view-section.active { display: block; animation: fadeIn 0.3s ease; }
+
+        /* ========== RESPONSIVE TABLES → CARDS ========== */
+        @media (max-width: 700px) {
+            .responsive-table thead { display: none; }
+            .responsive-table,
+            .responsive-table tbody,
+            .responsive-table tr,
+            .responsive-table td { display: block; width: 100%; }
+            .responsive-table tr {
+                border: 1px solid var(--border);
+                border-radius: 12px;
+                margin-bottom: 12px;
+                background: var(--surface);
+                overflow: hidden;
+                box-shadow: 0 2px 8px rgba(20, 83, 45, 0.04);
+            }
+            .responsive-table tr:hover td { background: transparent; }
+            .responsive-table td {
+                border: none;
+                border-bottom: 1px dashed var(--border);
+                padding: 10px 14px;
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                gap: 12px;
+                text-align: right;
+                font-size: 0.86rem;
+            }
+            .responsive-table td:last-child { border-bottom: none; }
+            .responsive-table td::before {
+                content: attr(data-label);
+                font-size: 0.7rem;
+                text-transform: uppercase;
+                letter-spacing: 0.5px;
+                font-weight: 700;
+                color: var(--text-muted);
+                text-align: left;
+                flex-shrink: 0;
+            }
+            .responsive-table td.cell-main {
+                display: block;
+                text-align: left;
+                background: rgba(20, 83, 45, 0.03);
+                padding: 12px 14px;
+            }
+            .responsive-table td.cell-main::before { display: none; }
+            .responsive-table td.cell-actions { justify-content: flex-end; }
+            .responsive-table td.cell-actions::before { display: none; }
+            .responsive-table .doc-name { align-items: flex-start; }
+        }
+
+        /* ========== RESPONSIVE ========== */
+        @media (max-width: 1024px) {
+            .stats-grid { grid-template-columns: repeat(2, 1fr); }
+            .task-cards-grid, .program-grid { grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); }
+        }
+
+        @media (max-width: 768px) {
+            .sidebar { transform: translateX(-100%); box-shadow: none; }
+            .sidebar.open { transform: translateX(0); box-shadow: 4px 0 30px rgba(0, 0, 0, 0.25); }
+            .main-content { margin-left: 0; }
+            .menu-toggle { display: flex; }
+            .header-title { font-size: 1.05rem; }
+            .header-title span { display: none; }
+            .page-content { padding: 16px 16px 40px; }
+            .stats-grid { grid-template-columns: repeat(2, 1fr); gap: 12px; }
+            .stat-card { padding: 14px; gap: 12px; flex-direction: column; }
+            .stat-icon { width: 40px; height: 40px; font-size: 1.05rem; }
+            .stat-info h3 { font-size: 1.25rem; }
+            .stat-info p { font-size: 0.78rem; }
+            .section-header { padding: 14px 16px; }
+            .section-body { padding: 16px; }
+            .toolbar { flex-direction: column; }
+            .search-box { min-width: 100%; }
+            .filter-select { width: 100%; min-width: 0; }
+            .form-grid { grid-template-columns: 1fr; }
+            .profile-header { flex-direction: column; text-align: center; }
+            .profile-avatar-large { width: 70px; height: 70px; font-size: 1.7rem; }
+            #toast { right: 12px; left: 12px; top: 12px; min-width: unset; max-width: unset; }
+            .appointment-item { flex-wrap: wrap; }
+            .appointment-info { flex-basis: calc(100% - 70px); }
+            .message-time { display: none; }
+            .task-cards-grid, .program-grid { grid-template-columns: 1fr; }
+            .section-actions { width: 100%; }
+            .section-actions .btn { flex: 1; justify-content: center; }
+        }
+
+        @media (max-width: 480px) {
+            .header-profile-info { display: none; }
+            .top-header { padding: 12px 14px; }
+            .header-btn { width: 36px; height: 36px; }
+            .stats-grid { grid-template-columns: 1fr; }
+            .stat-card { flex-direction: row; align-items: center; }
+            .action-btn { width: 32px; height: 32px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar(false)"></div>
+    <div id="toast">
+        <div class="toast-icon" id="toastIcon">ℹ️</div>
+        <div class="toast-content"><h4 id="toastTitle">Notification</h4><p id="toastMsg">Message</p></div>
+    </div>
+
+    <!-- ================= SIDEBAR ================= -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <img src="./images/stackly_logo.webp" alt="Stackly Charity" class="logo-img">
+        </div>
+        <nav class="nav-menu">
+            <div class="nav-section">
+                <div class="nav-section-label" onclick="toggleSection(this)">Main <i class="fas fa-chevron-down toggle-icon"></i></div>
+                <div class="nav-items-container">
+                    <button class="nav-item active" data-view="dashboard" onclick="switchView('dashboard')"><i class="fas fa-th-large"></i> Dashboard</button>
+                </div>
+            </div>
+            <div class="nav-section">
+                <div class="nav-section-label" onclick="toggleSection(this)">Programs <i class="fas fa-chevron-down toggle-icon"></i></div>
+                <div class="nav-items-container">
+                    <button class="nav-item" data-view="programs" onclick="switchView('programs')"><i class="fas fa-seedling"></i> Active Programs <span class="nav-badge neutral" id="navProgramCount">6</span></button>
+                    <button class="nav-item" data-view="beneficiaries" onclick="switchView('beneficiaries')"><i class="fas fa-users"></i> Beneficiaries <span class="nav-badge neutral" id="navBenefCount">12</span></button>
+                    <button class="nav-item" data-view="impactReports" onclick="switchView('impactReports')"><i class="fas fa-chart-bar"></i> Impact Reports <span class="nav-badge" id="navReportCount">3</span></button>
+                </div>
+            </div>
+            <div class="nav-section">
+                <div class="nav-section-label" onclick="toggleSection(this)">Field Operations <i class="fas fa-chevron-down toggle-icon"></i></div>
+                <div class="nav-items-container">
+                    <button class="nav-item" data-view="fieldVisits" onclick="switchView('fieldVisits')"><i class="fas fa-map-marked-alt"></i> Field Visits <span class="nav-badge neutral">4</span></button>
+                    <button class="nav-item" data-view="volunteers" onclick="switchView('volunteers')"><i class="fas fa-hands-helping"></i> Volunteers <span class="nav-badge">5</span></button>
+                </div>
+            </div>
+            <div class="nav-section">
+                <div class="nav-section-label" onclick="toggleSection(this)">Fundraising <i class="fas fa-chevron-down toggle-icon"></i></div>
+                <div class="nav-items-container">
+                    <button class="nav-item" data-view="donations" onclick="switchView('donations')"><i class="fas fa-hand-holding-heart"></i> Donations Log</button>
+                    <button class="nav-item" data-view="grants" onclick="switchView('grants')"><i class="fas fa-file-signature"></i> Grants <span class="nav-badge">2</span></button>
+                    <button class="nav-item" data-view="myTasks" onclick="switchView('myTasks')"><i class="fas fa-tasks"></i> My Tasks <span class="nav-badge">5</span></button>
+                </div>
+            </div>
+            <div class="nav-section">
+                <div class="nav-section-label" onclick="toggleSection(this)">Communication <i class="fas fa-chevron-down toggle-icon"></i></div>
+                <div class="nav-items-container">
+                    <button class="nav-item" data-view="messages" onclick="switchView('messages')"><i class="fas fa-envelope"></i> Messages <span class="nav-badge" id="navMsgCount">4</span></button>
+                    <button class="nav-item" data-view="activity" onclick="switchView('activity')"><i class="fas fa-clock"></i> Activity Log</button>
+                </div>
+            </div>
+            <div class="nav-section">
+                <div class="nav-section-label" onclick="toggleSection(this)">Account <i class="fas fa-chevron-down toggle-icon"></i></div>
+                <div class="nav-items-container">
+                    <button class="nav-item" data-view="profile" onclick="switchView('profile')"><i class="fas fa-user-cog"></i> Profile &amp; Settings</button>
+                    <button class="nav-item" data-view="help" onclick="switchView('help')"><i class="fas fa-question-circle"></i> Help &amp; Support</button>
+                </div>
+            </div>
+            <div style="margin-top:12px; padding-top:12px; border-top:1px solid rgba(255,255,255,0.1);">
+                <button class="nav-item" onclick="handleLogout()" style="color:rgba(255,120,120,0.95);"><i class="fas fa-sign-out-alt"></i> Sign Out</button>
+            </div>
+        </nav>
+        <div class="sidebar-footer">
+            <div class="user-mini">
+                <div class="user-mini-avatar" id="sidebarAvatar">E</div>
+                <div class="user-mini-info">
+                    <div class="user-mini-name" id="sidebarName">Staff</div>
+                    <div class="user-mini-role" id="sidebarRole">staff@stacklycharity.org</div>
+                </div>
+            </div>
+        </div>
+    </aside>
+
+    <!-- ================= MAIN ================= -->
+    <main class="main-content">
+        <header class="top-header">
+            <div class="header-left">
+                <button class="menu-toggle" onclick="toggleSidebar()" aria-label="Open menu"><i class="fas fa-bars"></i></button>
+                <h1 class="header-title" id="pageTitle">Dashboard <span>— Overview</span></h1>
+            </div>
+            <div class="header-right">
+                <button class="header-btn" onclick="showToast('info','No new notifications','You are all caught up!')" aria-label="Notifications">
+                    <i class="fas fa-bell"></i><span class="badge">3</span>
+                </button>
+                <div class="header-profile" onclick="switchView('profile')">
+                    <div class="header-profile-avatar" id="headerAvatar">E</div>
+                    <div class="header-profile-info">
+                        <div class="header-profile-name" id="headerName">Staff</div>
+                        <div class="header-profile-role">Program Officer</div>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <div class="page-content">
+
+            <!-- ============ DASHBOARD ============ -->
+            <div class="view-section active" id="view-dashboard">
+                <div class="stats-grid">
+                    <div class="stat-card animate-in" style="animation-delay:0.05s">
+                        <div class="stat-icon green"><i class="fas fa-seedling"></i></div>
+                        <div class="stat-info"><h3 id="statActivePrograms">6</h3><p>Active Programs</p></div>
+                    </div>
+                    <div class="stat-card animate-in" style="animation-delay:0.1s">
+                        <div class="stat-icon blue"><i class="fas fa-users"></i></div>
+                        <div class="stat-info"><h3 id="statBeneficiaries">0</h3><p>Beneficiaries Reached</p></div>
+                    </div>
+                    <div class="stat-card animate-in" style="animation-delay:0.15s">
+                        <div class="stat-icon purple"><i class="fas fa-hands-helping"></i></div>
+                        <div class="stat-info"><h3 id="statVolunteers">0</h3><p>Volunteers Managed</p></div>
+                    </div>
+                    <div class="stat-card animate-in" style="animation-delay:0.2s">
+                        <div class="stat-icon amber"><i class="fas fa-chart-bar"></i></div>
+                        <div class="stat-info"><h3 id="statReportsDue">0</h3><p>Reports Due</p></div>
+                    </div>
+                </div>
+
+                <div class="section-card animate-in" style="animation-delay:0.25s">
+                    <div class="section-header">
+                        <div class="section-title"><i class="fas fa-bullseye"></i> Priority Programs</div>
+                        <div class="section-actions">
+                            <button class="btn btn-outline btn-sm" onclick="switchView('programs')"><i class="fas fa-list"></i> View All</button>
+                        </div>
+                    </div>
+                    <div class="section-body"><div id="priorityProgramsList"></div></div>
+                </div>
+
+                <div class="section-card animate-in" style="animation-delay:0.3s">
+                    <div class="section-header">
+                        <div class="section-title"><i class="fas fa-calendar-day"></i> Upcoming Field Visits</div>
+                        <div class="section-actions">
+                            <button class="btn btn-outline btn-sm" onclick="switchView('fieldVisits')"><i class="fas fa-map-marked-alt"></i> All Visits</button>
+                        </div>
+                    </div>
+                    <div class="section-body"><div id="upcomingVisitsList"></div></div>
+                </div>
+
+                <div class="section-card animate-in" style="animation-delay:0.35s">
+                    <div class="section-header"><div class="section-title"><i class="fas fa-bolt"></i> Quick Actions</div></div>
+                    <div class="section-body">
+                        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;">
+                            <button class="btn btn-outline btn-block" onclick="switchView('programs')"><i class="fas fa-seedling"></i> Manage Programs</button>
+                            <button class="btn btn-outline btn-block" onclick="switchView('beneficiaries')"><i class="fas fa-user-plus"></i> Add Beneficiary</button>
+                            <button class="btn btn-outline btn-block" onclick="switchView('volunteers')"><i class="fas fa-hands-helping"></i> Assign Volunteer</button>
+                            <button class="btn btn-outline btn-block" onclick="switchView('impactReports')"><i class="fas fa-file-export"></i> Submit Report</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ============ PROGRAMS ============ -->
+            <div class="view-section" id="view-programs">
+                <div class="section-card">
+                    <div class="section-header">
+                        <div class="section-title"><i class="fas fa-seedling"></i> Active Programs</div>
+                        <div class="section-actions">
+                            <button class="btn btn-primary btn-sm" onclick="showToast('info','New Program','Opening program creation form...')"><i class="fas fa-plus"></i> New Program</button>
+                        </div>
+                    </div>
+                    <div class="section-body">
+                        <div class="toolbar">
+                            <div class="search-box">
+                                <i class="fas fa-search"></i>
+                                <input type="text" id="programSearch" placeholder="Search programs..." oninput="renderPrograms()">
+                            </div>
+                            <select class="filter-select" id="programStatusFilter" onchange="renderPrograms()">
+                                <option value="all">All Status</option>
+                                <option value="active">Active</option>
+                                <option value="ongoing">Ongoing</option>
+                                <option value="completed">Completed</option>
+                            </select>
+                        </div>
+                        <div class="program-grid" id="programsGrid"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ============ BENEFICIARIES ============ -->
+            <div class="view-section" id="view-beneficiaries">
+                <div class="section-card">
+                    <div class="section-header">
+                        <div class="section-title"><i class="fas fa-users"></i> Beneficiary Registry</div>
+                        <div class="section-actions">
+                            <button class="btn btn-primary btn-sm" onclick="showToast('info','Register Beneficiary','Opening registration form...')"><i class="fas fa-user-plus"></i> Register</button>
+                        </div>
+                    </div>
+                    <div class="section-body">
+                        <div class="toolbar">
+                            <div class="search-box">
+                                <i class="fas fa-search"></i>
+                                <input type="text" id="benefSearch" placeholder="Search by name, ID or program..." oninput="renderBeneficiaries()">
+                            </div>
+                            <select class="filter-select" id="benefProgramFilter" onchange="renderBeneficiaries()">
+                                <option value="all">All Programs</option>
+                            </select>
+                            <select class="filter-select" id="benefStatusFilter" onchange="renderBeneficiaries()">
+                                <option value="all">All Status</option>
+                                <option value="active">Active</option>
+                                <option value="verified">Verified</option>
+                                <option value="pending">Pending</option>
+                            </select>
+                        </div>
+                        <div class="table-scroll">
+                            <table class="doc-table responsive-table">
+                                <thead>
+                                    <tr>
+                                        <th>Beneficiary</th>
+                                        <th>Program</th>
+                                        <th>Location</th>
+                                        <th>Enrolled</th>
+                                        <th>Status</th>
+                                        <th style="text-align:right;">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="beneficiariesTableBody"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ============ IMPACT REPORTS ============ -->
+            <div class="view-section" id="view-impactReports">
+                <div class="section-card">
+                    <div class="section-header">
+                        <div class="section-title"><i class="fas fa-chart-bar"></i> Impact Reports</div>
+                        <div class="section-actions">
+                            <button class="btn btn-primary btn-sm" onclick="showToast('info','New Report','Opening report builder...')"><i class="fas fa-plus"></i> New Report</button>
+                        </div>
+                    </div>
+                    <div class="section-body">
+                        <div class="toolbar">
+                            <div class="search-box">
+                                <i class="fas fa-search"></i>
+                                <input type="text" id="reportSearch" placeholder="Search reports..." oninput="renderImpactReports()">
+                            </div>
+                            <select class="filter-select" id="reportStatusFilter" onchange="renderImpactReports()">
+                                <option value="all">All Status</option>
+                                <option value="draft">Draft</option>
+                                <option value="submitted">Submitted</option>
+                                <option value="approved">Approved</option>
+                            </select>
+                        </div>
+                        <div class="table-scroll">
+                            <table class="doc-table responsive-table">
+                                <thead>
+                                    <tr>
+                                        <th>Report</th>
+                                        <th>Program</th>
+                                        <th>Period</th>
+                                        <th>Due Date</th>
+                                        <th>Status</th>
+                                        <th style="text-align:right;">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="impactReportsTableBody"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ============ FIELD VISITS ============ -->
+            <div class="view-section" id="view-fieldVisits">
+                <div class="section-card">
+                    <div class="section-header">
+                        <div class="section-title"><i class="fas fa-map-marked-alt"></i> Field Visits</div>
+                        <div class="section-actions">
+                            <button class="btn btn-primary btn-sm" onclick="showToast('info','Schedule Visit','Opening field visit scheduler...')"><i class="fas fa-plus"></i> Schedule</button>
+                        </div>
+                    </div>
+                    <div class="section-body"><div id="fieldVisitsList"></div></div>
+                </div>
+            </div>
+
+            <!-- ============ VOLUNTEERS ============ -->
+            <div class="view-section" id="view-volunteers">
+                <div class="section-card">
+                    <div class="section-header">
+                        <div class="section-title"><i class="fas fa-hands-helping"></i> Volunteer Coordination</div>
+                        <div class="section-actions">
+                            <button class="btn btn-primary btn-sm" onclick="showToast('info','Add Volunteer','Opening volunteer onboarding...')"><i class="fas fa-plus"></i> Add Volunteer</button>
+                        </div>
+                    </div>
+                    <div class="section-body">
+                        <div class="toolbar">
+                            <div class="search-box">
+                                <i class="fas fa-search"></i>
+                                <input type="text" id="volSearch" placeholder="Search volunteers..." oninput="renderVolunteers()">
+                            </div>
+                            <select class="filter-select" id="volStatusFilter" onchange="renderVolunteers()">
+                                <option value="all">All Status</option>
+                                <option value="active">Active</option>
+                                <option value="pending">Pending Verification</option>
+                                <option value="paused">Paused</option>
+                            </select>
+                        </div>
+                        <div class="table-scroll">
+                            <table class="doc-table responsive-table">
+                                <thead>
+                                    <tr>
+                                        <th>Volunteer</th>
+                                        <th>Assigned Program</th>
+                                        <th>Role</th>
+                                        <th>Hours</th>
+                                        <th>Status</th>
+                                        <th style="text-align:right;">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="volunteersTableBody"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ============ DONATIONS LOG ============ -->
+            <div class="view-section" id="view-donations">
+                <div class="section-card">
+                    <div class="section-header">
+                        <div class="section-title"><i class="fas fa-hand-holding-heart"></i> Donations Log</div>
+                        <div class="section-actions">
+                            <button class="btn btn-outline btn-sm" onclick="showToast('info','Export','Exporting donation log...')"><i class="fas fa-download"></i> Export</button>
+                        </div>
+                    </div>
+                    <div class="section-body">
+                        <div class="toolbar">
+                            <div class="search-box">
+                                <i class="fas fa-search"></i>
+                                <input type="text" id="donLogSearch" placeholder="Search by donor or receipt..." oninput="renderDonationLog()">
+                            </div>
+                            <select class="filter-select" id="donLogStatusFilter" onchange="renderDonationLog()">
+                                <option value="all">All Status</option>
+                                <option value="completed">Completed</option>
+                                <option value="pending">Pending</option>
+                                <option value="failed">Failed</option>
+                            </select>
+                        </div>
+                        <div class="table-scroll">
+                            <table class="doc-table responsive-table">
+                                <thead>
+                                    <tr>
+                                        <th>Donor / Receipt</th>
+                                        <th>Program</th>
+                                        <th>Date</th>
+                                        <th>Amount</th>
+                                        <th>Status</th>
+                                        <th style="text-align:right;">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="donationLogTableBody"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ============ GRANTS ============ -->
+            <div class="view-section" id="view-grants">
+                <div class="section-card">
+                    <div class="section-header">
+                        <div class="section-title"><i class="fas fa-file-signature"></i> Grant Applications</div>
+                        <div class="section-actions">
+                            <button class="btn btn-primary btn-sm" onclick="showToast('info','New Grant','Opening grant application form...')"><i class="fas fa-plus"></i> New Application</button>
+                        </div>
+                    </div>
+                    <div class="section-body">
+                        <div class="table-scroll">
+                            <table class="doc-table responsive-table">
+                                <thead>
+                                    <tr>
+                                        <th>Grant / Funder</th>
+                                        <th>Program</th>
+                                        <th>Amount</th>
+                                        <th>Deadline</th>
+                                        <th>Status</th>
+                                        <th style="text-align:right;">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="grantsTableBody"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ============ MY TASKS ============ -->
+            <div class="view-section" id="view-myTasks">
+                <div class="section-card">
+                    <div class="section-header">
+                        <div class="section-title"><i class="fas fa-tasks"></i> My Tasks</div>
+                        <div class="section-actions">
+                            <button class="btn btn-primary btn-sm" onclick="showToast('info','New Task','Opening task creation form...')"><i class="fas fa-plus"></i> New Task</button>
+                        </div>
+                    </div>
+                    <div class="section-body"><div class="task-cards-grid" id="myTasksGrid"></div></div>
+                </div>
+            </div>
+
+            <!-- ============ MESSAGES ============ -->
+            <div class="view-section" id="view-messages">
+                <div class="section-card">
+                    <div class="section-header">
+                        <div class="section-title"><i class="fas fa-envelope"></i> Messages</div>
+                        <div class="section-actions">
+                            <button class="btn btn-primary btn-sm" onclick="showToast('info','Compose','Opening message composer...')"><i class="fas fa-pen"></i> Compose</button>
+                        </div>
+                    </div>
+                    <div class="section-body"><div id="messagesList"></div></div>
+                </div>
+            </div>
+
+            <!-- ============ ACTIVITY ============ -->
+            <div class="view-section" id="view-activity">
+                <div class="section-card">
+                    <div class="section-header"><div class="section-title"><i class="fas fa-history"></i> Activity Log</div></div>
+                    <div class="section-body"><div class="activity-list" id="activityList"></div></div>
+                </div>
+            </div>
+
+            <!-- ============ PROFILE ============ -->
+            <div class="view-section" id="view-profile">
+                <div class="section-card">
+                    <div class="section-header"><div class="section-title"><i class="fas fa-user"></i> Profile Settings</div></div>
+                    <div class="section-body">
+                        <div class="profile-header">
+                            <div class="profile-avatar-large" id="profileAvatar">E</div>
+                            <div class="profile-header-info">
+                                <h2 id="profileName">Staff Name</h2>
+                                <p id="profileEmail">staff@stacklycharity.org</p>
+                            </div>
+                        </div>
+                        <div class="form-grid">
+                            <div class="form-group"><label>Full Name</label><input type="text" id="editName" value=""></div>
+                            <div class="form-group"><label>Email Address</label><input type="email" id="editEmail" value="" disabled></div>
+                            <div class="form-group">
+                                <label>Phone Number</label>
+                                <input type="tel" id="editPhone" value="" maxlength="10" inputmode="numeric"
+                                    oninput="this.value = this.value.replace(/[^0-9]/g,'')" placeholder="10-digit mobile number">
+                            </div>
+                            <div class="form-group"><label>Employee ID</label><input type="text" value="EMP-2024-0156" disabled></div>
+                            <div class="form-group">
+                                <label>Department</label>
+                                <select id="editDepartment">
+                                    <option>Program Management</option>
+                                    <option>Field Operations</option>
+                                    <option>Fundraising &amp; Grants</option>
+                                    <option>Volunteer Coordination</option>
+                                    <option>Impact &amp; Reporting</option>
+                                </select>
+                            </div>
+                            <div class="form-group"><label>Designation</label><input type="text" id="editDesignation" value="Program Officer"></div>
+                            <div class="form-group full"><label>Base Location</label><input type="text" id="editLocation" placeholder="City / Region"></div>
+                        </div>
+                        <div style="margin-top:24px;display:flex;gap:10px;justify-content:flex-end;flex-wrap:wrap;">
+                            <button class="btn btn-outline" onclick="resetProfile()">Reset</button>
+                            <button class="btn btn-primary" onclick="saveProfile()"><i class="fas fa-save"></i> Save Changes</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="section-card">
+                    <div class="section-header"><div class="section-title"><i class="fas fa-shield-alt"></i> Security</div></div>
+                    <div class="section-body">
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label>Current Password</label>
+                                <div class="password-wrapper">
+                                    <input type="password" id="currPassword" placeholder="••••••••">
+                                    <button type="button" class="toggle-password" onclick="togglePassword('currPassword', this)" aria-label="Show password">
+                                        <i class="fas fa-eye"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label>New Password</label>
+                                <div class="password-wrapper">
+                                    <input type="password" id="newPassword" placeholder="Min 8 chars with special">
+                                    <button type="button" class="toggle-password" onclick="togglePassword('newPassword', this)" aria-label="Show password">
+                                        <i class="fas fa-eye"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label>Confirm New Password</label>
+                                <div class="password-wrapper">
+                                    <input type="password" id="confirmPassword" placeholder="••••••••">
+                                    <button type="button" class="toggle-password" onclick="togglePassword('confirmPassword', this)" aria-label="Show password">
+                                        <i class="fas fa-eye"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <div style="margin-top:16px;display:flex;justify-content:flex-end;">
+                            <button class="btn btn-primary" onclick="changePassword()"><i class="fas fa-key"></i> Update Password</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ============ HELP ============ -->
+            <div class="view-section" id="view-help">
+                <div class="section-card">
+                    <div class="section-header"><div class="section-title"><i class="fas fa-question-circle"></i> Frequently Asked Questions</div></div>
+                    <div class="section-body"><div id="faqList"></div></div>
+                </div>
+                <div class="section-card">
+                    <div class="section-header"><div class="section-title"><i class="fas fa-headset"></i> Contact Support</div></div>
+                    <div class="section-body">
+                        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;">
+                            <button class="btn btn-outline btn-block" style="padding:16px;" onclick="showToast('info','IT Helpdesk','Connecting to IT helpdesk...')"><i class="fas fa-comment-dots" style="font-size:1.2rem;"></i> IT Helpdesk</button>
+                            <button class="btn btn-outline btn-block" style="padding:16px;" onclick="showToast('info','HR Portal','Opening HR portal...')"><i class="fas fa-users" style="font-size:1.2rem;"></i> HR Portal</button>
+                            <button class="btn btn-outline btn-block" style="padding:16px;" onclick="showToast('info','Manager','Contacting your reporting manager...')"><i class="fas fa-user-tie" style="font-size:1.2rem;"></i> Contact Manager</button>
+                            <button class="btn btn-outline btn-block" style="padding:16px;" onclick="showToast('info','Playbook','Opening program playbook and SOPs...')"><i class="fas fa-book" style="font-size:1.2rem;"></i> Program Playbook</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <script>
+        /* ==================================================
+           DATA STORE — Stackly Charity (NGO & Nonprofit)
+        ================================================== */
+        let programs = [
+            { id: 1, name: 'Education for All', category: 'Education', icon: 'fa-graduation-cap',
+              raised: 780000, goal: 1200000, beneficiaries: 2450, status: 'active',
+              manager: 'Priya Nair', startDate: '2025-06-01',
+              description: 'Scholarships, books and digital classrooms for children from low-income communities.' },
+            { id: 2, name: 'Clean Water Initiative', category: 'Water & Sanitation', icon: 'fa-tint',
+              raised: 540000, goal: 800000, beneficiaries: 1800, status: 'active',
+              manager: 'Meera Iyer', startDate: '2025-08-15',
+              description: 'Borewells, filtration units and hygiene training for villages without safe water.' },
+            { id: 3, name: 'Food Relief Drive', category: 'Hunger Relief', icon: 'fa-utensils',
+              raised: 920000, goal: 1000000, beneficiaries: 5600, status: 'active',
+              manager: 'Rahul Verma', startDate: '2025-04-01',
+              description: 'Monthly ration kits and community kitchens for vulnerable families.' },
+            { id: 4, name: 'Healthcare Camps', category: 'Health', icon: 'fa-stethoscope',
+              raised: 310000, goal: 600000, beneficiaries: 1200, status: 'ongoing',
+              manager: 'Dr. Anil Kapoor', startDate: '2025-11-10',
+              description: 'Free medical camps, screenings and medicines in rural districts.' },
+            { id: 5, name: 'Women Empowerment', category: 'Livelihood', icon: 'fa-female',
+              raised: 465000, goal: 500000, beneficiaries: 640, status: 'active',
+              manager: 'Sunita Rao', startDate: '2025-09-05',
+              description: 'Skill training, micro-enterprise grants and self-help group support.' },
+            { id: 6, name: 'Animal Welfare', category: 'Animal Welfare', icon: 'fa-paw',
+              raised: 180000, goal: 400000, beneficiaries: 900, status: 'active',
+              manager: 'Kiran Desai', startDate: '2026-01-20',
+              description: 'Rescue, sterilisation and shelter support for street animals.' },
+            { id: 7, name: 'Disaster Relief Fund', category: 'Emergency Response', icon: 'fa-house-damage',
+              raised: 250000, goal: 250000, beneficiaries: 3100, status: 'completed',
+              manager: 'Rahul Verma', startDate: '2025-07-01',
+              description: 'Rapid response kits, shelter material and rebuilding support after floods.' }
+        ];
+
+        let beneficiaries = [
+            { id: 1, name: 'Ramesh Yadav', program: 'Education for All', location: 'Sector 12, Jaipur', enrolled: '2025-06-15', status: 'active', initials: 'RY', color: '#2d6a4f' },
+            { id: 2, name: 'Sunita Devi', program: 'Women Empowerment', location: 'Ward 7, Patna', enrolled: '2025-09-20', status: 'active', initials: 'SD', color: '#805ad5' },
+            { id: 3, name: 'Imran Khan', program: 'Clean Water Initiative', location: 'Block C, Bhopal', enrolled: '2025-08-22', status: 'verified', initials: 'IK', color: '#d69e2e' },
+            { id: 4, name: 'Lakshmi Patel', program: 'Healthcare Camps', location: 'Village Kheri, MP', enrolled: '2025-11-15', status: 'active', initials: 'LP', color: '#319795' },
+            { id: 5, name: 'Mohan Lal', program: 'Food Relief Drive', location: 'Slum Colony, Delhi', enrolled: '2025-04-10', status: 'verified', initials: 'ML', color: '#e53e3e' },
+            { id: 6, name: 'Fatima Sheikh', program: 'Education for All', location: 'Sector 8, Jaipur', enrolled: '2025-06-18', status: 'active', initials: 'FS', color: '#38a169' },
+            { id: 7, name: 'Ravi Kumar', program: 'Clean Water Initiative', location: 'Block A, Bhopal', enrolled: '2025-09-01', status: 'pending', initials: 'RK', color: '#2c5282' },
+            { id: 8, name: 'Anjali Sharma', program: 'Women Empowerment', location: 'Ward 3, Patna', enrolled: '2025-10-05', status: 'active', initials: 'AS', color: '#b8941f' },
+            { id: 9, name: 'Deepak Verma', program: 'Food Relief Drive', location: 'Slum Colony, Delhi', enrolled: '2025-05-12', status: 'verified', initials: 'DV', color: '#805ad5' },
+            { id: 10, name: 'Kavita Singh', program: 'Healthcare Camps', location: 'Village Barwani, MP', enrolled: '2025-12-02', status: 'active', initials: 'KS', color: '#e53e3e' },
+            { id: 11, name: 'Arjun Mehta', program: 'Animal Welfare', location: 'Zone 4, Ahmedabad', enrolled: '2026-02-01', status: 'pending', initials: 'AM', color: '#319795' },
+            { id: 12, name: 'Pooja Nair', program: 'Education for All', location: 'Sector 15, Jaipur', enrolled: '2026-01-10', status: 'active', initials: 'PN', color: '#38a169' }
+        ];
+
+        let impactReports = [
+            { id: 1, title: 'Education for All — Q2 2026', program: 'Education for All', period: 'Apr – Jun 2026', dueDate: '2026-08-15', status: 'draft', author: 'Priya Nair' },
+            { id: 2, title: 'Clean Water Initiative — Q2 2026', program: 'Clean Water Initiative', period: 'Apr – Jun 2026', dueDate: '2026-08-20', status: 'draft', author: 'Meera Iyer' },
+            { id: 3, title: 'Food Relief Drive — Monthly Jul 2026', program: 'Food Relief Drive', period: 'July 2026', dueDate: '2026-08-10', status: 'submitted', author: 'Rahul Verma' },
+            { id: 4, title: 'Healthcare Camps — Half Yearly', program: 'Healthcare Camps', period: 'Jan – Jun 2026', dueDate: '2026-07-30', status: 'approved', author: 'Dr. Anil Kapoor' },
+            { id: 5, title: 'Women Empowerment — Q2 2026', program: 'Women Empowerment', period: 'Apr – Jun 2026', dueDate: '2026-08-18', status: 'draft', author: 'Sunita Rao' },
+            { id: 6, title: 'Animal Welfare — Q1 2026', program: 'Animal Welfare', period: 'Jan – Mar 2026', dueDate: '2026-05-15', status: 'approved', author: 'Kiran Desai' },
+            { id: 7, title: 'Disaster Relief — Final Report', program: 'Disaster Relief Fund', period: 'Jul 2025 – Mar 2026', dueDate: '2026-04-30', status: 'approved', author: 'Rahul Verma' },
+            { id: 8, title: 'Food Relief Drive — Monthly Aug 2026', program: 'Food Relief Drive', period: 'August 2026', dueDate: '2026-09-10', status: 'draft', author: 'Rahul Verma' }
+        ];
+
+        let fieldVisits = [
+            { id: 1, date: '2026-08-15', day: '15', month: 'Aug', title: 'Clean Water Unit Inspection', location: 'Village Kheri, Madhya Pradesh', time: '9:00 AM – 2:00 PM', with: 'Meera Iyer (Field Coordinator)', status: 'upcoming', purpose: 'Verify filtration unit installation' },
+            { id: 2, date: '2026-08-19', day: '19', month: 'Aug', title: 'Education Centre Visit', location: 'Sector 12 School, Jaipur', time: '10:00 AM – 1:00 PM', with: 'Priya Nair (Program Head)', status: 'upcoming', purpose: 'Digital classroom review' },
+            { id: 3, date: '2026-08-23', day: '23', month: 'Aug', title: 'Community Kitchen Audit', location: 'Ward 7 Kitchen, Patna', time: '8:00 AM – 12:00 PM', with: 'Rahul Verma (Program Manager)', status: 'upcoming', purpose: 'Monthly hygiene and stock audit' },
+            { id: 4, date: '2026-08-27', day: '27', month: 'Aug', title: 'Healthcare Camp Setup', location: 'Block C Health Centre, Bhopal', time: '7:00 AM – 4:00 PM', with: 'Dr. Anil Kapoor', status: 'upcoming', purpose: 'Pre-camp readiness check' },
+            { id: 5, date: '2026-07-28', day: '28', month: 'Jul', title: 'Women SHG Meeting', location: 'Ward 3 Community Hall, Patna', time: '3:00 PM – 6:00 PM', with: 'Sunita Rao', status: 'completed', purpose: 'Monthly SHG review', notes: 'All 6 groups on track' },
+            { id: 6, date: '2026-07-15', day: '15', month: 'Jul', title: 'Animal Shelter Visit', location: 'Zone 4 Shelter, Ahmedabad', time: '10:00 AM – 3:00 PM', with: 'Kiran Desai', status: 'completed', purpose: 'Rescue capacity review', notes: 'Shelter at 78% capacity' }
+        ];
+
+        let volunteers = [
+            { id: 1, name: 'Aarav Sharma', program: 'Education for All', role: 'Teaching Volunteer', hours: 42, status: 'active', initials: 'AS', color: '#2d6a4f', joined: '2025-06-20' },
+            { id: 2, name: 'Ananya Iyer', program: 'Clean Water Initiative', role: 'Field Survey Lead', hours: 28, status: 'active', initials: 'AI', color: '#805ad5', joined: '2025-09-01' },
+            { id: 3, name: 'Rohan Gupta', program: 'Food Relief Drive', role: 'Distribution Coordinator', hours: 55, status: 'active', initials: 'RG', color: '#d69e2e', joined: '2025-04-15' },
+            { id: 4, name: 'Diya Kapoor', program: 'Healthcare Camps', role: 'Registration Desk', hours: 18, status: 'pending', initials: 'DK', color: '#319795', joined: '2026-08-01' },
+            { id: 5, name: 'Karan Verma', program: 'Women Empowerment', role: 'Skill Trainer', hours: 36, status: 'active', initials: 'KV', color: '#e53e3e', joined: '2025-10-10' },
+            { id: 6, name: 'Nisha Rao', program: 'Education for All', role: 'Mentor', hours: 24, status: 'active', initials: 'NR', color: '#38a169', joined: '2026-01-05' },
+            { id: 7, name: 'Aditya Menon', program: 'Animal Welfare', role: 'Rescue Support', hours: 12, status: 'paused', initials: 'AM', color: '#2c5282', joined: '2026-02-12' },
+            { id: 8, name: 'Sanya Bhatt', program: 'Food Relief Drive', role: 'Kitchen Volunteer', hours: 8, status: 'pending', initials: 'SB', color: '#b8941f', joined: '2026-08-05' }
+        ];
+
+        let donationsLog = [
+            { id: 1, donor: 'Amit Sharma', receipt: 'DON-2026-0451', program: 'Education for All', date: '2026-08-12', amount: 5000, method: 'UPI', status: 'completed' },
+            { id: 2, donor: 'Priya Patel', receipt: 'DON-2026-0438', program: 'Clean Water Initiative', date: '2026-08-01', amount: 2500, method: 'Credit Card', status: 'completed' },
+            { id: 3, donor: 'Rajesh Kumar', receipt: 'DON-2026-0421', program: 'Food Relief Drive', date: '2026-07-25', amount: 10000, method: 'Bank Transfer', status: 'completed' },
+            { id: 4, donor: 'Neha Singh', receipt: 'DON-2026-0398', program: 'Healthcare Camps', date: '2026-07-14', amount: 1500, method: 'UPI', status: 'pending' },
+            { id: 5, donor: 'Vikram Joshi', receipt: 'DON-2026-0377', program: 'Education for All', date: '2026-07-02', amount: 2500, method: 'Credit Card', status: 'completed' },
+            { id: 6, donor: 'Ananya Gupta', receipt: 'DON-2026-0350', program: 'Women Empowerment', date: '2026-06-18', amount: 7500, method: 'Net Banking', status: 'completed' },
+            { id: 7, donor: 'Sanjay Reddy', receipt: 'DON-2026-0329', program: 'Disaster Relief Fund', date: '2026-06-05', amount: 3000, method: 'UPI', status: 'failed' },
+            { id: 8, donor: 'Meera Nair', receipt: 'DON-2026-0301', program: 'Clean Water Initiative', date: '2026-05-22', amount: 2500, method: 'Credit Card', status: 'completed' },
+            { id: 9, donor: 'Harsh Vardhan', receipt: 'DON-2026-0277', program: 'Animal Welfare', date: '2026-05-09', amount: 1000, method: 'UPI', status: 'completed' },
+            { id: 10, donor: 'Ritu Malhotra', receipt: 'DON-2026-0245', program: 'Education for All', date: '2026-04-26', amount: 2500, method: 'Credit Card', status: 'completed' }
+        ];
+
+        let grants = [
+            { id: 1, title: 'Rural Education Expansion Grant', funder: 'Tata Trusts', program: 'Education for All', amount: 1500000, deadline: '2026-09-15', status: 'draft', owner: 'Priya Nair' },
+            { id: 2, title: 'WASH Infrastructure Support', funder: 'Azim Premji Foundation', program: 'Clean Water Initiative', amount: 800000, deadline: '2026-09-30', status: 'submitted', owner: 'Meera Iyer' },
+            { id: 3, title: 'Nutrition for Children Program', funder: 'Infosys Foundation', program: 'Food Relief Drive', amount: 1200000, deadline: '2026-08-30', status: 'pending', owner: 'Rahul Verma' },
+            { id: 4, title: 'Women Skill Development Fund', funder: 'HDFC Parivartan', program: 'Women Empowerment', amount: 600000, deadline: '2026-10-10', status: 'approved', owner: 'Sunita Rao' },
+            { id: 5, title: 'Community Health Outreach', funder: 'Wipro Cares', program: 'Healthcare Camps', amount: 950000, deadline: '2026-09-05', status: 'urgent', owner: 'Dr. Anil Kapoor' },
+            { id: 6, title: 'Animal Rescue & Rehab Fund', funder: 'Mars Foundation', program: 'Animal Welfare', amount: 350000, deadline: '2026-08-25', status: 'submitted', owner: 'Kiran Desai' }
+        ];
+
+        let myTasks = [
+            { id: 201, title: 'Submit Education Q2 impact report', dueDate: '2026-08-15', priority: 'high', status: 'inprogress', assignedBy: 'Program Head', type: 'Reporting' },
+            { id: 202, title: 'Verify 12 new beneficiary registrations', dueDate: '2026-08-14', priority: 'medium', status: 'pending', assignedBy: 'Field Coordinator', type: 'Verification' },
+            { id: 203, title: 'Review grant application — Wipro Cares', dueDate: '2026-08-13', priority: 'urgent', status: 'inprogress', assignedBy: 'Manager', type: 'Grants' },
+            { id: 204, title: 'Coordinate volunteers for weekend drive', dueDate: '2026-08-16', priority: 'medium', status: 'pending', assignedBy: 'Volunteer Lead', type: 'Coordination' },
+            { id: 205, title: 'Monthly donor acknowledgment emails', dueDate: '2026-08-11', priority: 'high', status: 'overdue', assignedBy: 'Fundraising', type: 'Communication' },
+            { id: 206, title: 'Field visit preparation — Kheri village', dueDate: '2026-08-15', priority: 'low', status: 'pending', assignedBy: 'Self', type: 'Field Ops' },
+            { id: 207, title: 'Update program dashboard metrics', dueDate: '2026-08-18', priority: 'low', status: 'completed', assignedBy: 'Manager', type: 'Administrative' }
+        ];
+
+        let messages = [
+            { id: 301, sender: 'Priya Nair — Program Head', subject: 'Education Q2 report submission', preview: 'Please prioritise the Q2 impact report for Education for All — the board reviews it next week...', time: '10:42 AM', unread: true, initials: 'PN', color: '#2d6a4f' },
+            { id: 302, sender: 'Meera Iyer — Field Coordinator', subject: 'Clean Water unit issue at Kheri', preview: 'One filtration unit needs a filter replacement. I have scheduled a visit on the 15th...', time: 'Yesterday', unread: true, initials: 'MI', color: '#805ad5' },
+            { id: 303, sender: 'Rahul Verma — Program Manager', subject: 'Food Relief — volunteer shortage', preview: 'We are short two volunteers for this weekend\'s distribution drive. Can you assign someone...', time: '2 days ago', unread: true, initials: 'RV', color: '#d69e2e' },
+            { id: 304, sender: 'Grants Office', subject: 'Wipro Cares deadline reminder', preview: 'The Community Health Outreach grant deadline is 5 September. Please complete the draft...', time: '3 days ago', unread: true, initials: 'GO', color: '#319795' },
+            { id: 305, sender: 'HR Department', subject: 'Annual training calendar', preview: 'Please complete the mandatory safeguarding and PSEA training by end of the month...', time: '4 days ago', unread: false, initials: 'HR', color: '#e53e3e' },
+            { id: 306, sender: 'Sunita Rao — Women Empowerment', subject: 'SHG success story — please publish', preview: 'One of our SHG groups crossed ₹1 lakh turnover this month. This deserves a story...', time: '5 days ago', unread: false, initials: 'SR', color: '#38a169' }
+        ];
+
+        let activities = [
+            { icon: 'fa-check-circle', color: 'success', text: 'You <strong>submitted</strong> Food Relief Drive monthly report', time: '2 hours ago' },
+            { icon: 'fa-user-plus', color: 'info', text: 'You registered <strong>Pooja Nair</strong> as a beneficiary', time: '4 hours ago' },
+            { icon: 'fa-hands-helping', color: 'purple', text: 'You assigned <strong>Rohan Gupta</strong> to Food Relief Drive', time: '6 hours ago' },
+            { icon: 'fa-exclamation-circle', color: 'error', text: '<strong>Wipro Cares grant</strong> deadline approaching — 5 Sept', time: '1 day ago' },
+            { icon: 'fa-upload', color: 'info', text: 'You uploaded <strong>Kheri field visit photos</strong>', time: '1 day ago' },
+            { icon: 'fa-heart', color: 'success', text: '<strong>₹10,000</strong> donation received from Rajesh Kumar', time: '2 days ago' },
+            { icon: 'fa-file-signature', color: 'warning', text: 'Grant <strong>Tata Trusts</strong> moved to submitted', time: '3 days ago' }
+        ];
+
+        let faqs = [
+            { q: 'How do I register a new beneficiary?', a: 'Go to <strong>Beneficiaries</strong> in the sidebar and click <strong>Register</strong>. Fill in the required details, select the program, and submit. All new registrations go through a verification step by the Field Coordinator before becoming active.' },
+            { q: 'What is the timeline for impact reports?', a: 'Monthly reports are due by the 10th of the following month. Quarterly reports are due within 15 days of quarter close. Half-yearly and annual reports follow the board calendar shared by the Impact &amp; Reporting team.' },
+            { q: 'How do I assign a volunteer to a program?', a: 'Open <strong>Volunteers</strong> from the sidebar, click on the volunteer row, and use the assign action. You can set their role and program. Pending volunteers need verification first — coordinate with the Volunteer Lead.' },
+            { q: 'How are grant applications tracked?', a: 'All grant applications live in the <strong>Grants</strong> section. Statuses flow from Draft → Submitted → Pending → Approved/Rejected. Red/urgent status means the deadline is within 7 days — escalate to your manager.' },
+            { q: 'Who do I contact for technical issues?', a: 'For issues with the dashboard or field data collection tools, contact <strong>IT Helpdesk</strong> from Help &amp; Support. For program SOPs and templates, check the <strong>Program Playbook</strong>.' }
+        ];
+
+        /* ==================================================
+           SESSION / INIT
+        ================================================== */
+        const userName = localStorage.getItem('loggedInUserName') || 'Rahul Mehta';
+        const userEmail = localStorage.getItem('loggedInUserEmail') || 'rahul.mehta@stacklycharity.org';
+        const userRole = localStorage.getItem('userRole');
+
+        if (userRole && userRole !== 'employee') {
+            window.location.href = 'index.html';
+        }
+
+        function init() {
+            const initials = userName.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
+
+            document.getElementById('sidebarName').textContent = userName;
+            document.getElementById('sidebarAvatar').textContent = initials;
+            document.getElementById('sidebarRole').textContent = userEmail;
+            document.getElementById('headerName').textContent = userName;
+            document.getElementById('headerAvatar').textContent = initials;
+            document.getElementById('profileName').textContent = userName;
+            document.getElementById('profileEmail').textContent = userEmail;
+            document.getElementById('profileAvatar').textContent = initials;
+            document.getElementById('editName').value = userName;
+            document.getElementById('editEmail').value = userEmail;
+
+            buildBeneficiaryProgramFilter();
+            updateStats();
+            renderPriorityPrograms();
+            renderUpcomingVisits();
+            renderPrograms();
+            renderBeneficiaries();
+            renderImpactReports();
+            renderFieldVisits();
+            renderVolunteers();
+            renderDonationLog();
+            renderGrants();
+            renderMyTasks();
+            renderMessages();
+            renderActivity();
+            renderFaqs();
+            updateNavBadges();
+        }
+
+        function updateNavBadges() {
+            document.getElementById('navProgramCount').textContent = programs.filter(p => p.status !== 'completed').length;
+            document.getElementById('navBenefCount').textContent = beneficiaries.length;
+            const reportsDue = impactReports.filter(r => r.status === 'draft').length;
+            document.getElementById('navReportCount').textContent = reportsDue;
+            document.getElementById('navReportCount').style.display = reportsDue ? 'inline-block' : 'none';
+            const unread = messages.filter(m => m.unread).length;
+            document.getElementById('navMsgCount').textContent = unread;
+            document.getElementById('navMsgCount').style.display = unread ? 'inline-block' : 'none';
+        }
+
+        /* ==================================================
+           NAVIGATION
+        ================================================== */
+        function switchView(view) {
+            document.querySelectorAll('.view-section').forEach(s => s.classList.remove('active'));
+            const target = document.getElementById('view-' + view);
+            if (target) target.classList.add('active');
+
+            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+            const activeNav = document.querySelector('.nav-item[data-view="' + view + '"]');
+            if (activeNav) activeNav.classList.add('active');
+
+            const titles = {
+                dashboard: 'Dashboard <span>— Overview</span>',
+                programs: 'Active Programs <span>— Program Management</span>',
+                beneficiaries: 'Beneficiaries <span>— Registry</span>',
+                impactReports: 'Impact Reports <span>— Reporting</span>',
+                fieldVisits: 'Field Visits <span>— Schedule</span>',
+                volunteers: 'Volunteers <span>— Coordination</span>',
+                donations: 'Donations Log <span>— Fundraising</span>',
+                grants: 'Grants <span>— Applications</span>',
+                myTasks: 'My Tasks <span>— Assignments</span>',
+                messages: 'Messages <span>— Inbox</span>',
+                activity: 'Activity Log <span>— History</span>',
+                profile: 'Profile <span>— Settings</span>',
+                help: 'Help &amp; Support <span>— Resources</span>'
+            };
+            document.getElementById('pageTitle').innerHTML = titles[view] || view;
+
+            if (window.innerWidth <= 768) toggleSidebar(false);
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function toggleSidebar(force) {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('sidebarOverlay');
+            const shouldOpen = force !== undefined ? force : !sidebar.classList.contains('open');
+            sidebar.classList.toggle('open', shouldOpen);
+            overlay.classList.toggle('show', shouldOpen);
+            document.body.style.overflow = shouldOpen && window.innerWidth <= 768 ? 'hidden' : '';
+        }
+
+        function toggleSection(labelElement) {
+            labelElement.closest('.nav-section').classList.toggle('collapsed');
+        }
+
+        /* ==================================================
+           HELPERS
+        ================================================== */
+        function formatINR(num) {
+            return '₹' + Number(num).toLocaleString('en-IN');
+        }
+
+        function getStatusBadge(status) {
+            const labels = {
+                active: 'Active', ongoing: 'Ongoing', completed: 'Completed', closed: 'Closed',
+                verified: 'Verified', pending: 'Pending', paused: 'Paused',
+                draft: 'Draft', submitted: 'Submitted', approved: 'Approved', rejected: 'Rejected',
+                urgent: 'Urgent', high: 'High', medium: 'Medium', low: 'Low',
+                inprogress: 'In Progress', overdue: 'Overdue',
+                failed: 'Failed', processing: 'Processing', paid: 'Paid', issued: 'Issued'
+            };
+            return '<span class="status-badge status-' + status + '">' + (labels[status] || status) + '</span>';
+        }
+
+        function updateStats() {
+            const activePrograms = programs.filter(p => p.status !== 'completed').length;
+            const totalBeneficiaries = programs.reduce((sum, p) => sum + p.beneficiaries, 0);
+            const activeVolunteers = volunteers.filter(v => v.status === 'active').length;
+            const reportsDue = impactReports.filter(r => r.status === 'draft').length;
+
+            document.getElementById('statActivePrograms').textContent = activePrograms;
+            document.getElementById('statBeneficiaries').textContent = totalBeneficiaries.toLocaleString('en-IN');
+            document.getElementById('statVolunteers').textContent = activeVolunteers;
+            document.getElementById('statReportsDue').textContent = reportsDue;
+        }
+
+        /* ==================================================
+           DASHBOARD
+        ================================================== */
+        function renderPriorityPrograms() {
+            const container = document.getElementById('priorityProgramsList');
+            const list = programs.filter(p => p.status !== 'completed').slice(0, 4);
+
+            if (!list.length) {
+                container.innerHTML = '<div class="empty-state"><i class="fas fa-seedling"></i><h4>No active programs</h4></div>';
+                return;
+            }
+
+            container.innerHTML = '<div style="display:flex;flex-direction:column;gap:20px;">' +
+                list.map(p => {
+                    const pct = Math.min(100, Math.round((p.raised / p.goal) * 100));
+                    return '<div>' +
+                        '<div style="display:flex;justify-content:space-between;gap:12px;margin-bottom:8px;flex-wrap:wrap;">' +
+                            '<div style="display:flex;align-items:center;gap:10px;min-width:0;">' +
+                                '<div class="program-icon" style="width:34px;height:34px;font-size:0.85rem;"><i class="fas ' + p.icon + '"></i></div>' +
+                                '<div style="min-width:0;">' +
+                                    '<strong style="color:var(--primary);font-size:0.92rem;">' + p.name + '</strong>' +
+                                    '<div style="font-size:0.75rem;color:var(--text-muted);">' + p.manager + ' · ' + p.beneficiaries.toLocaleString('en-IN') + ' beneficiaries</div>' +
+                                '</div>' +
+                            '</div>' +
+                            '<span style="font-size:0.82rem;color:var(--text-muted);font-weight:600;">' + pct + '% funded</span>' +
+                        '</div>' +
+                        '<div class="progress-track"><div class="progress-fill" style="width:' + pct + '%"></div></div>' +
+                    '</div>';
+                }).join('') + '</div>';
+        }
+
+        function renderUpcomingVisits() {
+            const upcoming = fieldVisits.filter(v => v.status === 'upcoming').slice(0, 3);
+            const container = document.getElementById('upcomingVisitsList');
+
+            if (!upcoming.length) {
+                container.innerHTML = '<div class="empty-state"><i class="fas fa-map-marked-alt"></i><h4>No upcoming field visits</h4><p>Schedule your next visit</p></div>';
+                return;
+            }
+
+            container.innerHTML = upcoming.map(v =>
+                '<div class="appointment-item">' +
+                    '<div class="appointment-date-box"><span class="day">' + v.day + '</span><span class="month">' + v.month + '</span></div>' +
+                    '<div class="appointment-info">' +
+                        '<h4>' + v.title + '</h4>' +
+                        '<p><i class="fas fa-map-marker-alt"></i> ' + v.location + '</p>' +
+                        '<p><i class="fas fa-clock"></i> ' + v.time + ' &nbsp;|&nbsp; <i class="fas fa-user"></i> ' + v.with + '</p>' +
+                    '</div>' +
+                    '<div class="action-btns">' +
+                        '<button class="action-btn" title="Reschedule" onclick="event.stopPropagation();showToast(\'info\',\'Reschedule\',\'Opening reschedule options...\')"><i class="fas fa-calendar-alt"></i></button>' +
+                    '</div>' +
+                '</div>'
+            ).join('');
+        }
+
+        /* ==================================================
+           PROGRAMS
+        ================================================== */
+        function renderPrograms() {
+            const grid = document.getElementById('programsGrid');
+            const search = (document.getElementById('programSearch')?.value || '').toLowerCase();
+            const statusFilter = document.getElementById('programStatusFilter')?.value || 'all';
+
+            const filtered = programs.filter(p =>
+                (p.name.toLowerCase().includes(search) || p.manager.toLowerCase().includes(search)) &&
+                (statusFilter === 'all' || p.status === statusFilter)
+            );
+
+            if (!filtered.length) {
+                grid.innerHTML = '<div class="empty-state"><i class="fas fa-search"></i><h4>No programs found</h4><p>Try adjusting your filters</p></div>';
+                return;
+            }
+
+            grid.innerHTML = filtered.map(p => {
+                const pct = Math.min(100, Math.round((p.raised / p.goal) * 100));
+                return '<div class="program-card">' +
+                    '<div class="program-top">' +
+                        '<div class="program-icon"><i class="fas ' + p.icon + '"></i></div>' +
+                        '<div class="program-head">' +
+                            '<div class="program-name">' + p.name + '</div>' +
+                            '<div class="program-cat">' + p.category + ' · Since ' + p.startDate + '</div>' +
+                        '</div>' +
+                        getStatusBadge(p.status) +
+                    '</div>' +
+                    '<p class="program-desc">' + p.description + '</p>' +
+                    '<div class="progress-track"><div class="progress-fill" style="width:' + pct + '%"></div></div>' +
+                    '<div class="program-stats"><span>' + formatINR(p.raised) + ' raised</span><span>Goal ' + formatINR(p.goal) + '</span></div>' +
+                    '<div class="program-meta">' +
+                        '<span><i class="fas fa-users"></i> ' + p.beneficiaries.toLocaleString('en-IN') + '</span>' +
+                        '<span><i class="fas fa-chart-pie"></i> ' + pct + '%</span>' +
+                        '<span><i class="fas fa-user-tie"></i> ' + p.manager + '</span>' +
+                    '</div>' +
+                    '<div style="display:flex;gap:8px;flex-wrap:wrap;">' +
+                        '<button class="btn btn-outline btn-sm" style="flex:1;" onclick="showToast(\'info\',\'Program Details\',\'Opening ' + p.name + '...\')"><i class="fas fa-eye"></i> View</button>' +
+                        '<button class="btn btn-primary btn-sm" style="flex:1;" onclick="showToast(\'info\',\'Edit Program\',\'Editing ' + p.name + '...\')"><i class="fas fa-edit"></i> Edit</button>' +
+                    '</div>' +
+                '</div>';
+            }).join('');
+        }
+
+        /* ==================================================
+           BENEFICIARIES
+        ================================================== */
+        function buildBeneficiaryProgramFilter() {
+            const sel = document.getElementById('benefProgramFilter');
+            if (!sel) return;
+            const names = [...new Set(beneficiaries.map(b => b.program))].sort();
+            sel.innerHTML = '<option value="all">All Programs</option>' +
+                names.map(n => '<option value="' + n + '">' + n + '</option>').join('');
+        }
+
+        function renderBeneficiaries() {
+            const tbody = document.getElementById('beneficiariesTableBody');
+            const search = (document.getElementById('benefSearch')?.value || '').toLowerCase();
+            const program = document.getElementById('benefProgramFilter')?.value || 'all';
+            const status = document.getElementById('benefStatusFilter')?.value || 'all';
+
+            const filtered = beneficiaries.filter(b =>
+                (b.name.toLowerCase().includes(search) || b.location.toLowerCase().includes(search) || b.program.toLowerCase().includes(search)) &&
+                (program === 'all' || b.program === program) &&
+                (status === 'all' || b.status === status)
+            );
+
+            if (!filtered.length) {
+                tbody.innerHTML = '<tr><td colspan="6"><div class="empty-state"><i class="fas fa-search"></i><h4>No beneficiaries found</h4><p>Try adjusting your filters</p></div></td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = filtered.map(b =>
+                '<tr>' +
+                    '<td class="cell-main"><div class="doc-name">' +
+                        '<div class="client-avatar" style="width:36px;height:36px;font-size:0.8rem;background:' + b.color + ';">' + b.initials + '</div>' +
+                        '<div><div style="font-weight:600;color:var(--primary);">' + b.name + '</div>' +
+                        '<div style="font-size:0.78rem;color:var(--text-muted);">BEN-' + String(b.id).padStart(4, '0') + '</div></div>' +
+                    '</div></td>' +
+                    '<td data-label="Program">' + b.program + '</td>' +
+                    '<td data-label="Location">' + b.location + '</td>' +
+                    '<td data-label="Enrolled">' + b.enrolled + '</td>' +
+                    '<td data-label="Status">' + getStatusBadge(b.status) + '</td>' +
+                    '<td class="cell-actions"><div class="action-btns">' +
+                        '<button class="action-btn" title="View" onclick="showToast(\'info\',\'Beneficiary Details\',\'Opening ' + b.name + '...\')"><i class="fas fa-eye"></i></button>' +
+                        '<button class="action-btn" title="Edit" onclick="showToast(\'info\',\'Edit\',\'Editing ' + b.name + '...\')"><i class="fas fa-edit"></i></button>' +
+                    '</div></td>' +
+                '</tr>'
+            ).join('');
+        }
+
+        /* ==================================================
+           IMPACT REPORTS
+        ================================================== */
+        function renderImpactReports() {
+            const tbody = document.getElementById('impactReportsTableBody');
+            const search = (document.getElementById('reportSearch')?.value || '').toLowerCase();
+            const status = document.getElementById('reportStatusFilter')?.value || 'all';
+
+            const filtered = impactReports.filter(r =>
+                (r.title.toLowerCase().includes(search) || r.program.toLowerCase().includes(search)) &&
+                (status === 'all' || r.status === status)
+            );
+
+            if (!filtered.length) {
+                tbody.innerHTML = '<tr><td colspan="6"><div class="empty-state"><i class="fas fa-chart-bar"></i><h4>No reports found</h4><p>Try adjusting your filters</p></div></td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = filtered.map(r =>
+                '<tr>' +
+                    '<td class="cell-main"><div class="doc-name">' +
+                        '<div class="doc-icon"><i class="fas fa-chart-bar"></i></div>' +
+                        '<div><div style="font-weight:600;color:var(--primary);">' + r.title + '</div>' +
+                        '<div style="font-size:0.78rem;color:var(--text-muted);">By ' + r.author + '</div></div>' +
+                    '</div></td>' +
+                    '<td data-label="Program">' + r.program + '</td>' +
+                    '<td data-label="Period">' + r.period + '</td>' +
+                    '<td data-label="Due Date">' + r.dueDate + '</td>' +
+                    '<td data-label="Status">' + getStatusBadge(r.status) + '</td>' +
+                    '<td class="cell-actions"><div class="action-btns">' +
+                        '<button class="action-btn" title="View" onclick="showToast(\'info\',\'Report\',\'Opening ' + r.title + '...\')"><i class="fas fa-eye"></i></button>' +
+                        (r.status === 'draft'
+                            ? '<button class="action-btn" title="Submit" style="color:var(--success);" onclick="submitReport(' + r.id + ')"><i class="fas fa-paper-plane"></i></button>'
+                            : '<button class="action-btn" title="Download" onclick="showToast(\'success\',\'Download\',\'Downloading ' + r.title + '\')"><i class="fas fa-download"></i></button>') +
+                    '</div></td>' +
+                '</tr>'
+            ).join('');
+        }
+
+        function submitReport(id) {
+            const r = impactReports.find(x => x.id === id);
+            if (!r) return;
+            if (!confirm('Submit "' + r.title + '" for approval?')) return;
+            r.status = 'submitted';
+            renderImpactReports();
+            updateStats();
+            updateNavBadges();
+            showToast('success', 'Report Submitted', r.title + ' has been sent for approval.');
+        }
+
+        /* ==================================================
+           FIELD VISITS
+        ================================================== */
+        function renderFieldVisits() {
+            const container = document.getElementById('fieldVisitsList');
+            const upcoming = fieldVisits.filter(v => v.status === 'upcoming');
+            const past = fieldVisits.filter(v => v.status === 'completed');
+
+            let html = '<h4 style="margin-bottom:12px;color:var(--primary);font-size:0.95rem;"><i class="fas fa-calendar-check"></i> Upcoming Visits</h4>';
+            html += upcoming.length
+                ? upcoming.map(v =>
+                    '<div class="appointment-item">' +
+                        '<div class="appointment-date-box"><span class="day">' + v.day + '</span><span class="month">' + v.month + '</span></div>' +
+                        '<div class="appointment-info">' +
+                            '<h4>' + v.title + '</h4>' +
+                            '<p><i class="fas fa-map-marker-alt"></i> ' + v.location + '</p>' +
+                            '<p><i class="fas fa-clock"></i> ' + v.time + ' &nbsp;|&nbsp; <i class="fas fa-user"></i> ' + v.with + '</p>' +
+                            '<p style="margin-top:4px;font-size:0.78rem;"><i class="fas fa-bullseye"></i> Purpose: ' + v.purpose + '</p>' +
+                        '</div>' +
+                        '<div class="action-btns">' +
+                            '<button class="action-btn" title="Reschedule" onclick="event.stopPropagation();showToast(\'info\',\'Reschedule\',\'Opening reschedule options...\')"><i class="fas fa-calendar-alt"></i></button>' +
+                            '<button class="action-btn" title="Cancel" style="color:var(--error);" onclick="event.stopPropagation();cancelVisit(' + v.id + ')"><i class="fas fa-times"></i></button>' +
+                        '</div>' +
+                    '</div>'
+                ).join('')
+                : '<div class="empty-state"><i class="fas fa-calendar"></i><h4>No upcoming visits</h4><p>Schedule your next field trip</p></div>';
+
+            html += '<h4 style="margin:24px 0 12px;color:var(--text-muted);font-size:0.95rem;"><i class="fas fa-history"></i> Completed Visits</h4>';
+            html += past.length
+                ? past.map(v =>
+                    '<div class="appointment-item" style="opacity:0.78;">' +
+                        '<div class="appointment-date-box" style="background:var(--text-muted);"><span class="day">' + v.day + '</span><span class="month">' + v.month + '</span></div>' +
+                        '<div class="appointment-info">' +
+                            '<h4>' + v.title + '</h4>' +
+                            '<p><i class="fas fa-map-marker-alt"></i> ' + v.location + ' &nbsp;|&nbsp; <i class="fas fa-clock"></i> ' + v.time + '</p>' +
+                            (v.notes ? '<p style="font-size:0.78rem;margin-top:4px;color:var(--success);"><i class="fas fa-clipboard-check"></i> ' + v.notes + '</p>' : '') +
+                        '</div>' +
+                        '<span style="font-size:0.8rem;color:var(--text-muted);font-weight:600;">Completed</span>' +
+                    '</div>'
+                ).join('')
+                : '<div class="empty-state"><i class="fas fa-history"></i><h4>No completed visits</h4></div>';
+
+            container.innerHTML = html;
+        }
+
+        function cancelVisit(id) {
+            if (!confirm('Cancel this field visit?')) return;
+            fieldVisits = fieldVisits.filter(v => v.id !== id);
+            renderFieldVisits();
+            renderUpcomingVisits();
+            showToast('success', 'Visit Cancelled', 'The field visit has been removed.');
+        }
+
+        /* ==================================================
+           VOLUNTEERS
+        ================================================== */
+        function renderVolunteers() {
+            const tbody = document.getElementById('volunteersTableBody');
+            const search = (document.getElementById('volSearch')?.value || '').toLowerCase();
+            const status = document.getElementById('volStatusFilter')?.value || 'all';
+
+            const filtered = volunteers.filter(v =>
+                (v.name.toLowerCase().includes(search) || v.program.toLowerCase().includes(search) || v.role.toLowerCase().includes(search)) &&
+                (status === 'all' || v.status === status)
+            );
+
+            if (!filtered.length) {
+                tbody.innerHTML = '<tr><td colspan="6"><div class="empty-state"><i class="fas fa-hands-helping"></i><h4>No volunteers found</h4><p>Try adjusting your filters</p></div></td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = filtered.map(v =>
+                '<tr>' +
+                    '<td class="cell-main"><div class="doc-name">' +
+                        '<div class="client-avatar" style="width:36px;height:36px;font-size:0.8rem;background:' + v.color + ';">' + v.initials + '</div>' +
+                        '<div><div style="font-weight:600;color:var(--primary);">' + v.name + '</div>' +
+                        '<div style="font-size:0.78rem;color:var(--text-muted);">Since ' + v.joined + '</div></div>' +
+                    '</div></td>' +
+                    '<td data-label="Program">' + v.program + '</td>' +
+                    '<td data-label="Role">' + v.role + '</td>' +
+                    '<td data-label="Hours"><strong style="color:var(--primary);">' + v.hours + ' hrs</strong></td>' +
+                    '<td data-label="Status">' + getStatusBadge(v.status) + '</td>' +
+                    '<td class="cell-actions"><div class="action-btns">' +
+                        '<button class="action-btn" title="Message" onclick="showToast(\'info\',\'Message\',\'Composing message to ' + v.name + '...\')"><i class="fas fa-envelope"></i></button>' +
+                        '<button class="action-btn" title="Assign" onclick="showToast(\'info\',\'Assign\',\'Opening assignment for ' + v.name + '...\')"><i class="fas fa-tasks"></i></button>' +
+                    '</div></td>' +
+                '</tr>'
+            ).join('');
+        }
+
+        /* ==================================================
+           DONATION LOG
+        ================================================== */
+        function renderDonationLog() {
+            const tbody = document.getElementById('donationLogTableBody');
+            const search = (document.getElementById('donLogSearch')?.value || '').toLowerCase();
+            const status = document.getElementById('donLogStatusFilter')?.value || 'all';
+
+            const filtered = donationsLog.filter(d =>
+                (d.donor.toLowerCase().includes(search) || d.receipt.toLowerCase().includes(search) || d.program.toLowerCase().includes(search)) &&
+                (status === 'all' || d.status === status)
+            );
+
+            if (!filtered.length) {
+                tbody.innerHTML = '<tr><td colspan="6"><div class="empty-state"><i class="fas fa-hand-holding-heart"></i><h4>No donations found</h4><p>Try adjusting your filters</p></div></td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = filtered.map(d =>
+                '<tr>' +
+                    '<td class="cell-main"><div class="doc-name">' +
+                        '<div class="doc-icon"><i class="fas fa-heart"></i></div>' +
+                        '<div><div style="font-weight:600;color:var(--primary);">' + d.donor + '</div>' +
+                        '<div style="font-size:0.78rem;color:var(--text-muted);">' + d.receipt + ' · ' + d.method + '</div></div>' +
+                    '</div></td>' +
+                    '<td data-label="Program">' + d.program + '</td>' +
+                    '<td data-label="Date">' + d.date + '</td>' +
+                    '<td data-label="Amount"><strong style="color:var(--primary);">' + formatINR(d.amount) + '</strong></td>' +
+                    '<td data-label="Status">' + getStatusBadge(d.status) + '</td>' +
+                    '<td class="cell-actions"><div class="action-btns">' +
+                        '<button class="action-btn" title="View" onclick="showToast(\'info\',\'Donation\',\'Opening ' + d.receipt + '...\')"><i class="fas fa-eye"></i></button>' +
+                        '<button class="action-btn" title="Send Receipt" onclick="showToast(\'success\',\'Sent\',\'Receipt emailed to ' + d.donor + '\')"><i class="fas fa-envelope"></i></button>' +
+                    '</div></td>' +
+                '</tr>'
+            ).join('');
+        }
+
+        /* ==================================================
+           GRANTS
+        ================================================== */
+        function renderGrants() {
+            const tbody = document.getElementById('grantsTableBody');
+
+            if (!grants.length) {
+                tbody.innerHTML = '<tr><td colspan="6"><div class="empty-state"><i class="fas fa-file-signature"></i><h4>No grant applications</h4></div></td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = grants.map(g =>
+                '<tr>' +
+                    '<td class="cell-main"><div class="doc-name">' +
+                        '<div class="doc-icon"><i class="fas fa-file-signature"></i></div>' +
+                        '<div><div style="font-weight:600;color:var(--primary);">' + g.title + '</div>' +
+                        '<div style="font-size:0.78rem;color:var(--text-muted);">' + g.funder + ' · Owner: ' + g.owner + '</div></div>' +
+                    '</div></td>' +
+                    '<td data-label="Program">' + g.program + '</td>' +
+                    '<td data-label="Amount"><strong style="color:var(--primary);">' + formatINR(g.amount) + '</strong></td>' +
+                    '<td data-label="Deadline">' + g.deadline + '</td>' +
+                    '<td data-label="Status">' + getStatusBadge(g.status) + '</td>' +
+                    '<td class="cell-actions"><div class="action-btns">' +
+                        '<button class="action-btn" title="View" onclick="showToast(\'info\',\'Grant\',\'Opening ' + g.title + '...\')"><i class="fas fa-eye"></i></button>' +
+                        '<button class="action-btn" title="Edit" onclick="showToast(\'info\',\'Edit\',\'Editing ' + g.title + '...\')"><i class="fas fa-edit"></i></button>' +
+                    '</div></td>' +
+                '</tr>'
+            ).join('');
+        }
+
+        /* ==================================================
+           MY TASKS
+        ================================================== */
+        function renderMyTasks() {
+            const container = document.getElementById('myTasksGrid');
+            if (!myTasks.length) {
+                container.innerHTML = '<div class="empty-state"><i class="fas fa-tasks"></i><h4>No tasks assigned</h4></div>';
+                return;
+            }
+
+            container.innerHTML = myTasks.map(t => {
+                let dueClass = 'upcoming';
+                let dueText = 'Due: ' + t.dueDate;
+                if (t.status === 'overdue') { dueClass = 'overdue'; dueText = '⚠ Overdue — ' + t.dueDate; }
+                else if (t.status === 'completed') { dueClass = 'done'; dueText = '✓ Completed'; }
+
+                return '<div class="task-card" onclick="showToast(\'info\',\'Task\',\'Opening task: ' + t.title + '...\')">' +
+                    '<div class="task-card-header">' +
+                        '<span style="font-weight:700;color:var(--primary);font-size:0.85rem;">' + t.type + '</span>' +
+                        getStatusBadge(t.status) +
+                    '</div>' +
+                    '<div class="task-card-title">' + t.title + '</div>' +
+                    '<div class="task-card-meta">' +
+                        '<span><i class="fas fa-user"></i> ' + t.assignedBy + '</span>' +
+                        '<span><i class="fas fa-calendar"></i> ' + t.dueDate + '</span>' +
+                    '</div>' +
+                    '<div class="task-card-due ' + dueClass + '">' + dueText + '</div>' +
+                '</div>';
+            }).join('');
+        }
+
+        /* ==================================================
+           MESSAGES / ACTIVITY / FAQ
+        ================================================== */
+        function renderMessages() {
+            const container = document.getElementById('messagesList');
+            if (!messages.length) {
+                container.innerHTML = '<div class="empty-state"><i class="fas fa-envelope"></i><h4>No messages</h4></div>';
+                return;
+            }
+            container.innerHTML = messages.map(m =>
+                '<div class="message-item ' + (m.unread ? 'unread' : '') + '" onclick="openMessage(' + m.id + ')">' +
+                    '<div class="message-avatar" style="background:' + m.color + ';">' + m.initials + '</div>' +
+                    '<div class="message-content">' +
+                        '<div class="message-sender">' + m.sender +
+                            (m.unread ? ' <span style="font-size:0.7rem;color:var(--accent-hover);margin-left:6px;">● New</span>' : '') +
+                        '</div>' +
+                        '<div class="message-preview"><strong>' + m.subject + '</strong> — ' + m.preview + '</div>' +
+                    '</div>' +
+                    '<div class="message-time">' + m.time + '</div>' +
+                '</div>'
+            ).join('');
+        }
+
+        function openMessage(id) {
+            const m = messages.find(x => x.id === id);
+            if (m) m.unread = false;
+            renderMessages();
+            updateNavBadges();
+            showToast('info', 'Opening Message', 'Loading conversation with ' + (m ? m.sender : '') + '...');
+        }
+
+        function renderActivity() {
+            const colorMap = {
+                success: 'var(--success)', info: 'var(--info)', error: 'var(--error)',
+                purple: '#805ad5', teal: '#319795', warning: 'var(--warning)'
+            };
+            document.getElementById('activityList').innerHTML = activities.map(a =>
+                '<div class="activity-item">' +
+                    '<div class="activity-icon" style="color:' + (colorMap[a.color] || 'var(--primary)') + ';">' +
+                        '<i class="fas ' + a.icon + '"></i>' +
+                    '</div>' +
+                    '<div class="activity-content">' +
+                        '<div class="activity-text">' + a.text + '</div>' +
+                        '<div class="activity-time"><i class="far fa-clock" style="margin-right:4px;"></i>' + a.time + '</div>' +
+                    '</div>' +
+                '</div>'
+            ).join('');
+        }
+
+        function renderFaqs() {
+            document.getElementById('faqList').innerHTML = faqs.map((faq, i) =>
+                '<div class="faq-item" id="faq-' + i + '">' +
+                    '<div class="faq-question" onclick="toggleFaq(' + i + ')">' +
+                        '<span>' + faq.q + '</span>' +
+                        '<i class="fas fa-chevron-down" id="faqIcon-' + i + '" style="transition:transform 0.3s;"></i>' +
+                    '</div>' +
+                    '<div class="faq-answer">' + faq.a + '</div>' +
+                '</div>'
+            ).join('');
+        }
+
+        function toggleFaq(index) {
+            const item = document.getElementById('faq-' + index);
+            const icon = document.getElementById('faqIcon-' + index);
+            const isOpen = item.classList.contains('open');
+
+            document.querySelectorAll('.faq-item').forEach(f => f.classList.remove('open'));
+            document.querySelectorAll('[id^="faqIcon-"]').forEach(i => i.style.transform = 'rotate(0deg)');
+
+            if (!isOpen) {
+                item.classList.add('open');
+                icon.style.transform = 'rotate(180deg)';
+            }
+        }
+
+        /* ==================================================
+           PROFILE
+        ================================================== */
+        function saveProfile() {
+            const name = document.getElementById('editName').value.trim();
+            if (!name) { showToast('error', 'Invalid Name', 'Name cannot be empty.'); return; }
+
+            localStorage.setItem('loggedInUserName', name);
+            init();
+            showToast('success', 'Profile Updated', 'Your profile details have been saved.');
+        }
+
+        function resetProfile() {
+            document.getElementById('editName').value = userName;
+            document.getElementById('editPhone').value = '';
+            document.getElementById('editLocation').value = '';
+            document.getElementById('editDesignation').value = 'Program Officer';
+            showToast('info', 'Reset', 'Form values restored.');
+        }
+
+        function togglePassword(inputId, btn) {
+            const input = document.getElementById(inputId);
+            if (!input) return;
+
+            const show = input.type === 'password';
+            input.type = show ? 'text' : 'password';
+
+            const icon = btn.querySelector('i');
+            if (icon) icon.className = show ? 'fas fa-eye-slash' : 'fas fa-eye';
+            btn.setAttribute('aria-label', show ? 'Hide password' : 'Show password');
+        }
+
+        function changePassword() {
+            const curr = document.getElementById('currPassword').value;
+            const neu = document.getElementById('newPassword').value;
+            const conf = document.getElementById('confirmPassword').value;
+
+            if (!curr || !neu || !conf) { showToast('error', 'Missing Fields', 'Please fill all password fields.'); return; }
+            if (neu !== conf) { showToast('error', 'Mismatch', 'New passwords do not match.'); return; }
+            if (neu.length < 8) { showToast('error', 'Too Short', 'Password must be at least 8 characters.'); return; }
+
+            document.getElementById('currPassword').value = '';
+            document.getElementById('newPassword').value = '';
+            document.getElementById('confirmPassword').value = '';
+            showToast('success', 'Password Updated', 'Your password has been changed.');
+        }
+
+        /* ==================================================
+           TOAST / LOGOUT
+        ================================================== */
+        function showToast(type, title, msg) {
+            const toast = document.getElementById('toast');
+            const icon = document.getElementById('toastIcon');
+            const tTitle = document.getElementById('toastTitle');
+            const tMsg = document.getElementById('toastMsg');
+
+            toast.className = 'toast ' + type;
+            icon.textContent = type === 'success' ? '✅' : type === 'error' ? '❌' : 'ℹ️';
+            tTitle.textContent = title;
+            tMsg.textContent = msg;
+
+            requestAnimationFrame(() => toast.classList.add('show'));
+            clearTimeout(window.__toastTimer);
+            window.__toastTimer = setTimeout(() => toast.classList.remove('show'), 3200);
+        }
+
+        function handleLogout() {
+            if (!confirm('Are you sure you want to sign out?')) return;
+            localStorage.clear();
+            window.location.href = 'index.html';
+        }
+
+        /* ==================================================
+           MISC
+        ================================================== */
+        window.addEventListener('resize', function () {
+            if (window.innerWidth > 768) {
+                document.body.style.overflow = '';
+                document.getElementById('sidebarOverlay').classList.remove('show');
+                document.getElementById('sidebar').classList.remove('open');
+            }
+        });
+
+        document.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+</html>

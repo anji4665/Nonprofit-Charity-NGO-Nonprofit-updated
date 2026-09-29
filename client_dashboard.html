@@ -1,0 +1,2495 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Donor Dashboard — Stackly Charity</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #14532d;
+            --primary-light: #2d6a4f;
+            --accent: #d4af37;
+            --accent-hover: #b8941f;
+            --bg: #f2f6f3;
+            --surface: #ffffff;
+            --text: #1a202c;
+            --text-muted: #718096;
+            --border: #e2e8f0;
+            --success: #38a169;
+            --warning: #d69e2e;
+            --error: #e53e3e;
+            --info: #3182ce;
+            --shadow: 0 4px 20px rgba(20, 83, 45, 0.08);
+            --radius: 14px;
+            --sidebar-width: 264px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html { -webkit-text-size-adjust: 100%; }
+
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* ============ SIDEBAR ============ */
+        .sidebar {
+            position: fixed;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: var(--sidebar-width);
+            background: var(--primary);
+            color: #fff;
+            z-index: 100;
+            display: flex;
+            flex-direction: column;
+            transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 4px 0 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .sidebar-header {
+            padding: 22px 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+        .sidebar-header .logo-img {
+            height: 46px;
+            width: auto;
+            max-width: 100%;
+            object-fit: contain;
+            display: block;
+        }
+
+        .nav-menu {
+            flex: 1;
+            padding: 14px 12px;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .nav-section { margin-bottom: 6px; }
+
+        .nav-section-label {
+            font-size: 0.68rem;
+            text-transform: uppercase;
+            letter-spacing: 1.2px;
+            color: rgba(255, 255, 255, 0.35);
+            padding: 14px 16px 6px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            cursor: pointer;
+            user-select: none;
+            transition: color 0.2s;
+        }
+        .nav-section-label:hover { color: rgba(255, 255, 255, 0.6); }
+        .nav-section-label .toggle-icon { font-size: 0.7rem; transition: transform 0.3s; }
+        .nav-section.collapsed .nav-items-container { display: none; }
+        .nav-section.collapsed .toggle-icon { transform: rotate(-90deg); }
+
+        .nav-items-container { display: flex; flex-direction: column; gap: 2px; }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 11px 16px;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            color: rgba(255, 255, 255, 0.75);
+            font-size: 0.9rem;
+            font-weight: 500;
+            border: none;
+            background: none;
+            width: 100%;
+            text-align: left;
+            position: relative;
+            text-decoration: none;
+            font-family: inherit;
+        }
+        .nav-item:hover { background: rgba(255, 255, 255, 0.08); color: #fff; }
+        .nav-item.active { background: rgba(212, 175, 55, 0.16); color: var(--accent); }
+        .nav-item i { width: 22px; text-align: center; font-size: 1rem; }
+        .nav-item .nav-badge {
+            margin-left: auto;
+            background: var(--error);
+            color: #fff;
+            font-size: 0.65rem;
+            font-weight: 700;
+            padding: 2px 8px;
+            border-radius: 10px;
+            min-width: 20px;
+            text-align: center;
+            line-height: 1.4;
+        }
+        .nav-item .nav-badge.neutral { background: rgba(255, 255, 255, 0.2); color: #fff; }
+
+        .sidebar-footer {
+            padding: 14px 16px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            flex-shrink: 0;
+        }
+        .user-mini {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+        }
+        .user-mini-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: var(--accent);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 0.85rem;
+            color: var(--primary);
+            flex-shrink: 0;
+        }
+        .user-mini-info { flex: 1; min-width: 0; overflow: hidden; }
+        .user-mini-name {
+            font-size: 0.85rem;
+            font-weight: 600;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .user-mini-role {
+            font-size: 0.7rem;
+            color: rgba(255, 255, 255, 0.5);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .sidebar-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 99;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+        .sidebar-overlay.show { opacity: 1; visibility: visible; }
+
+        /* ============ LAYOUT ============ */
+        .main-content {
+            margin-left: var(--sidebar-width);
+            min-height: 100vh;
+            transition: margin-left 0.35s ease;
+        }
+
+        .top-header {
+            background: var(--surface);
+            padding: 16px 28px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            border-bottom: 1px solid var(--border);
+            position: sticky;
+            top: 0;
+            z-index: 50;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.03);
+        }
+        .header-left { display: flex; align-items: center; gap: 14px; min-width: 0; }
+        .menu-toggle {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 1.3rem;
+            color: var(--primary);
+            cursor: pointer;
+            padding: 6px 8px;
+            border-radius: 8px;
+            flex-shrink: 0;
+        }
+        .menu-toggle:hover { background: var(--bg); }
+        .header-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--primary);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .header-title span { color: var(--text-muted); font-weight: 400; font-size: 0.9rem; }
+        .header-right { display: flex; align-items: center; gap: 12px; flex-shrink: 0; }
+        .header-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            border: 1px solid var(--border);
+            background: var(--surface);
+            color: var(--text-muted);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+            position: relative;
+            transition: all 0.2s;
+            flex-shrink: 0;
+        }
+        .header-btn:hover { background: var(--bg); color: var(--primary); border-color: var(--primary-light); }
+        .header-btn .badge {
+            position: absolute;
+            top: -2px;
+            right: -2px;
+            width: 18px;
+            height: 18px;
+            background: var(--error);
+            color: #fff;
+            font-size: 0.65rem;
+            font-weight: 700;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 2px solid var(--surface);
+        }
+        .header-profile {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+            padding: 6px 10px;
+            border-radius: 10px;
+            transition: background 0.2s;
+        }
+        .header-profile:hover { background: var(--bg); }
+        .header-profile-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: var(--primary);
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 0.85rem;
+            flex-shrink: 0;
+        }
+        .header-profile-info { line-height: 1.2; }
+        .header-profile-name { font-size: 0.9rem; font-weight: 600; color: var(--text); }
+        .header-profile-role { font-size: 0.75rem; color: var(--text-muted); }
+
+        .page-content {
+            padding: 24px 28px 48px;
+            max-width: 1400px;
+        }
+
+        /* ============ STATS ============ */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+            margin-bottom: 24px;
+        }
+        .stat-card {
+            background: var(--surface);
+            border-radius: var(--radius);
+            padding: 20px;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border);
+            display: flex;
+            align-items: flex-start;
+            gap: 14px;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .stat-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px rgba(20, 83, 45, 0.12);
+        }
+        .stat-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.3rem;
+            flex-shrink: 0;
+        }
+        .stat-icon.green { background: rgba(56, 161, 105, 0.12); color: var(--success); }
+        .stat-icon.blue { background: rgba(49, 130, 206, 0.1); color: var(--info); }
+        .stat-icon.amber { background: rgba(214, 158, 46, 0.12); color: var(--warning); }
+        .stat-icon.red { background: rgba(229, 62, 62, 0.1); color: var(--error); }
+        .stat-icon.purple { background: rgba(128, 90, 213, 0.1); color: #805ad5; }
+        .stat-icon.teal { background: rgba(49, 151, 149, 0.1); color: #319795; }
+
+        .stat-info { min-width: 0; }
+        .stat-info h3 {
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: var(--primary);
+            margin-bottom: 2px;
+            word-break: break-word;
+            line-height: 1.15;
+        }
+        .stat-info p { font-size: 0.85rem; color: var(--text-muted); font-weight: 500; }
+
+        /* ============ CARDS ============ */
+        .section-card {
+            background: var(--surface);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border);
+            margin-bottom: 24px;
+            overflow: hidden;
+        }
+        .section-header {
+            padding: 18px 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            border-bottom: 1px solid var(--border);
+            flex-wrap: wrap;
+        }
+        .section-title {
+            font-size: 1.05rem;
+            font-weight: 700;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .section-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+        .section-body { padding: 20px 24px; }
+
+        /* ============ BUTTONS ============ */
+        .btn {
+            padding: 10px 18px;
+            border-radius: 10px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            border: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s;
+            font-family: inherit;
+            white-space: nowrap;
+        }
+        .btn-primary { background: var(--primary); color: #fff; }
+        .btn-primary:hover { background: var(--primary-light); transform: translateY(-1px); box-shadow: 0 4px 12px rgba(20, 83, 45, 0.25); }
+        .btn-outline { background: transparent; color: var(--primary); border: 1.5px solid var(--border); }
+        .btn-outline:hover { background: var(--bg); border-color: var(--primary-light); }
+        .btn-accent { background: var(--accent); color: #3a2c00; }
+        .btn-accent:hover { background: var(--accent-hover); color: #fff; transform: translateY(-1px); box-shadow: 0 4px 12px rgba(212, 175, 55, 0.3); }
+        .btn-sm { padding: 8px 14px; font-size: 0.85rem; }
+        .btn-block { width: 100%; justify-content: center; }
+
+        /* ============ TOOLBAR ============ */
+        .toolbar { display: flex; gap: 12px; margin-bottom: 20px; flex-wrap: wrap; }
+        .search-box { flex: 1; min-width: 220px; position: relative; }
+        .search-box input {
+            width: 100%;
+            padding: 10px 14px 10px 40px;
+            border: 1.5px solid var(--border);
+            border-radius: 10px;
+            font-size: 0.9rem;
+            background: var(--bg);
+            transition: all 0.2s;
+            font-family: inherit;
+        }
+        .search-box input:focus {
+            outline: none;
+            border-color: var(--primary-light);
+            background: #fff;
+            box-shadow: 0 0 0 3px rgba(20, 83, 45, 0.08);
+        }
+        .search-box i {
+            position: absolute;
+            left: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+        .filter-select {
+            padding: 10px 14px;
+            border: 1.5px solid var(--border);
+            border-radius: 10px;
+            font-size: 0.9rem;
+            background: var(--bg);
+            color: var(--text);
+            cursor: pointer;
+            font-family: inherit;
+            min-width: 150px;
+        }
+        .filter-select:focus { outline: none; border-color: var(--primary-light); }
+
+        /* ============ TABLES ============ */
+        .table-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+        .doc-table, .billing-table { width: 100%; border-collapse: collapse; }
+        .doc-table th, .billing-table th {
+            text-align: left;
+            padding: 12px 16px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--text-muted);
+            border-bottom: 2px solid var(--border);
+            white-space: nowrap;
+        }
+        .doc-table td, .billing-table td {
+            padding: 14px 16px;
+            font-size: 0.9rem;
+            border-bottom: 1px solid var(--border);
+            vertical-align: middle;
+        }
+        .doc-table tr:hover td, .billing-table tr:hover td { background: rgba(20, 83, 45, 0.02); }
+        .doc-table tr:last-child td, .billing-table tr:last-child td { border-bottom: none; }
+
+        .doc-name { display: flex; align-items: center; gap: 10px; }
+        .doc-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            background: rgba(20, 83, 45, 0.07);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--primary);
+            font-size: 0.9rem;
+            flex-shrink: 0;
+        }
+
+        /* ============ BADGES ============ */
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.78rem;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+        .status-badge::before { content: ''; width: 6px; height: 6px; border-radius: 50%; }
+        .status-completed, .status-approved, .status-active, .status-issued, .status-paid {
+            background: rgba(56, 161, 105, 0.1); color: var(--success);
+        }
+        .status-completed::before, .status-approved::before, .status-active::before,
+        .status-issued::before, .status-paid::before { background: var(--success); }
+        .status-pending, .status-processing {
+            background: rgba(214, 158, 46, 0.12); color: #b7791f;
+        }
+        .status-pending::before, .status-processing::before { background: var(--warning); }
+        .status-review { background: rgba(49, 130, 206, 0.1); color: var(--info); }
+        .status-review::before { background: var(--info); }
+        .status-failed, .status-rejected, .status-paused {
+            background: rgba(229, 62, 62, 0.1); color: var(--error);
+        }
+        .status-failed::before, .status-rejected::before, .status-paused::before { background: var(--error); }
+        .status-closed { background: rgba(113, 128, 150, 0.12); color: var(--text-muted); }
+        .status-closed::before { background: var(--text-muted); }
+
+        /* ============ ACTION BUTTONS ============ */
+        .action-btns { display: flex; gap: 6px; justify-content: flex-end; }
+        .action-btn {
+            width: 34px;
+            height: 34px;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            background: var(--surface);
+            color: var(--text-muted);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.85rem;
+            transition: all 0.2s;
+            flex-shrink: 0;
+        }
+        .action-btn:hover { background: var(--primary); color: #fff; border-color: var(--primary); }
+
+        /* ============ PROGRAM CARDS ============ */
+        .case-cards-grid, .program-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 16px;
+        }
+        .program-card {
+            background: var(--bg);
+            border-radius: 12px;
+            padding: 18px;
+            border: 1px solid var(--border);
+            transition: all 0.2s;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        .program-card:hover { border-color: var(--primary-light); box-shadow: 0 4px 16px rgba(20, 83, 45, 0.08); }
+        .program-top { display: flex; align-items: flex-start; gap: 12px; }
+        .program-icon {
+            width: 44px;
+            height: 44px;
+            border-radius: 12px;
+            background: rgba(212, 175, 55, 0.15);
+            color: #8a6d09;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+            flex-shrink: 0;
+        }
+        .program-head { flex: 1; min-width: 0; }
+        .program-name { font-weight: 700; font-size: 0.98rem; color: var(--primary); line-height: 1.25; }
+        .program-cat { font-size: 0.76rem; color: var(--text-muted); margin-top: 2px; }
+        .program-desc { font-size: 0.85rem; color: var(--text-muted); line-height: 1.5; }
+        .progress-track { height: 8px; background: var(--border); border-radius: 99px; overflow: hidden; }
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary-light), var(--accent));
+            border-radius: 99px;
+            transition: width 0.6s ease;
+        }
+        .program-stats {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--primary);
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+        .program-meta {
+            display: flex;
+            gap: 14px;
+            font-size: 0.78rem;
+            color: var(--text-muted);
+            flex-wrap: wrap;
+        }
+        .program-meta span { display: flex; align-items: center; gap: 5px; }
+
+        /* ============ ACTIVITY / MESSAGES ============ */
+        .activity-list { display: flex; flex-direction: column; gap: 14px; }
+        .activity-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 14px;
+            padding: 14px;
+            border-radius: 10px;
+            background: var(--bg);
+            transition: background 0.2s;
+        }
+        .activity-item:hover { background: rgba(20, 83, 45, 0.05); }
+        .activity-icon {
+            width: 38px;
+            height: 38px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.9rem;
+            flex-shrink: 0;
+            background: rgba(20, 83, 45, 0.06);
+        }
+        .activity-content { flex: 1; min-width: 0; }
+        .activity-text { font-size: 0.9rem; color: var(--text); line-height: 1.4; }
+        .activity-text strong { color: var(--primary); }
+        .activity-time { font-size: 0.8rem; color: var(--text-muted); margin-top: 4px; }
+
+        .message-item {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 14px 16px;
+            border-radius: 10px;
+            background: var(--bg);
+            border: 1px solid var(--border);
+            margin-bottom: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .message-item:hover { border-color: var(--primary-light); background: #fff; }
+        .message-item.unread { border-left: 3px solid var(--accent); background: rgba(212, 175, 55, 0.05); }
+        .message-avatar {
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 0.9rem;
+            color: #fff;
+        }
+        .message-content { flex: 1; min-width: 0; }
+        .message-sender { font-weight: 600; font-size: 0.9rem; color: var(--primary); }
+        .message-preview {
+            font-size: 0.82rem;
+            color: var(--text-muted);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .message-time { font-size: 0.75rem; color: var(--text-muted); white-space: nowrap; }
+
+        /* ============ SCHEDULE ITEMS ============ */
+        .appointment-item {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            padding: 16px;
+            border-radius: 12px;
+            background: var(--bg);
+            border: 1px solid var(--border);
+            margin-bottom: 10px;
+            transition: all 0.2s;
+        }
+        .appointment-item:hover { border-color: var(--primary-light); box-shadow: 0 2px 8px rgba(20, 83, 45, 0.05); }
+        .appointment-date-box {
+            width: 54px;
+            height: 54px;
+            border-radius: 10px;
+            background: var(--primary);
+            color: #fff;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            font-weight: 700;
+            line-height: 1.1;
+        }
+        .appointment-date-box .day { font-size: 1.2rem; }
+        .appointment-date-box .month { font-size: 0.68rem; text-transform: uppercase; opacity: 0.85; }
+        .appointment-info { flex: 1; min-width: 0; }
+        .appointment-info h4 { font-size: 0.95rem; font-weight: 600; color: var(--primary); margin-bottom: 3px; }
+        .appointment-info p { font-size: 0.83rem; color: var(--text-muted); line-height: 1.5; }
+
+        /* ============ DONATION FORM ============ */
+        .donate-layout {
+            display: grid;
+            grid-template-columns: 1.6fr 1fr;
+            gap: 24px;
+            align-items: start;
+        }
+        .form-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
+        .form-group { display: flex; flex-direction: column; gap: 6px; }
+        .form-group.full { grid-column: 1 / -1; }
+        .form-group label {
+            font-size: 0.78rem;
+            font-weight: 700;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            padding: 12px 14px;
+            border: 1.5px solid var(--border);
+            border-radius: 10px;
+            font-size: 0.95rem;
+            background: var(--bg);
+            font-family: inherit;
+            transition: all 0.2s;
+            width: 100%;
+        }
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: var(--primary-light);
+            background: #fff;
+            box-shadow: 0 0 0 3px rgba(20, 83, 45, 0.08);
+        }
+        .form-group input:disabled { background: #e2e8f0; color: var(--text-muted); cursor: not-allowed; }
+
+        /* =========================================================
+           PASSWORD FIELD + EYE ICON  (Edge / IE / Safari safe)
+           ========================================================= */
+
+        /* 1) Kill Edge / IE built-in reveal & clear buttons */
+        .form-group input[type="password"]::-ms-reveal,
+        .form-group input[type="password"]::-ms-clear,
+        .form-group input[type="password"]::-webkit-credentials-auto-fill-button,
+        .form-group input[type="password"]::-webkit-textfield-decoration-container{
+            display: none !important;
+            visibility: hidden !important;
+            width: 0 !important;
+            height: 0 !important;
+            margin: 0 !important;
+            padding: 0 !important;
+            pointer-events: none !important;
+            -webkit-appearance: none;
+            appearance: none;
+        }
+
+        /* 2) Wrapper */
+        .pwd-wrap{
+            position: relative;
+            display: block;
+            width: 100%;
+        }
+
+        /* 3) Reserve room on the right so text never slides under the icon */
+        .pwd-wrap input{
+            width: 100%;
+            padding-right: 46px !important;
+            text-overflow: ellipsis;
+        }
+
+        /* 4) Custom eye — centred without transform hacks */
+        .pwd-wrap .toggle-eye{
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            right: 14px;
+            margin: auto 0;
+            width: 22px;
+            height: 22px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.9rem;
+            line-height: 1;
+            color: var(--text-muted);
+            cursor: pointer;
+            z-index: 2;
+            background: transparent;
+            border: 0;
+            -webkit-user-select: none;
+            user-select: none;
+            transition: color 0.2s ease;
+        }
+        .pwd-wrap .toggle-eye:hover,
+        .pwd-wrap .toggle-eye:focus-visible{ color: var(--primary); }
+
+        .freq-toggle {
+            display: flex;
+            gap: 8px;
+            background: var(--bg);
+            padding: 6px;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            flex-wrap: wrap;
+        }
+        .freq-btn {
+            flex: 1;
+            min-width: 110px;
+            padding: 10px 14px;
+            border-radius: 9px;
+            border: none;
+            background: transparent;
+            font-family: inherit;
+            font-size: 0.88rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .freq-btn.active { background: var(--primary); color: #fff; box-shadow: 0 2px 8px rgba(20, 83, 45, 0.25); }
+
+        .amount-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(90px, 1fr));
+            gap: 10px;
+        }
+        .amount-btn {
+            padding: 14px 8px;
+            border-radius: 10px;
+            border: 1.5px solid var(--border);
+            background: var(--bg);
+            font-family: inherit;
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: var(--primary);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .amount-btn:hover { border-color: var(--accent); background: rgba(212, 175, 55, 0.08); }
+        .amount-btn.active { background: var(--accent); border-color: var(--accent); color: #3a2c00; }
+
+        .summary-box {
+            background: linear-gradient(160deg, var(--primary), #1e6b3f);
+            color: #fff;
+            border-radius: var(--radius);
+            padding: 22px;
+        }
+        .summary-box h3 { font-size: 1rem; margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
+        .summary-row {
+            display: flex;
+            justify-content: space-between;
+            gap: 12px;
+            font-size: 0.88rem;
+            padding: 9px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.14);
+        }
+        .summary-row:last-of-type { border-bottom: none; }
+        .summary-row span:first-child { color: rgba(255, 255, 255, 0.7); }
+        .summary-row span:last-child { font-weight: 700; text-align: right; }
+        .summary-total {
+            margin-top: 14px;
+            padding-top: 14px;
+            border-top: 2px solid rgba(212, 175, 55, 0.6);
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            gap: 10px;
+        }
+        .summary-total .label { font-size: 0.85rem; color: rgba(255, 255, 255, 0.8); }
+        .summary-total .value { font-size: 1.6rem; font-weight: 800; color: var(--accent); }
+        .impact-note {
+            margin-top: 16px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 12px 14px;
+            font-size: 0.83rem;
+            line-height: 1.5;
+            display: flex;
+            gap: 10px;
+            align-items: flex-start;
+        }
+        .impact-note i { color: var(--accent); margin-top: 2px; }
+
+        .pay-methods { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 10px; }
+        .pay-option {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 13px 14px;
+            border: 1.5px solid var(--border);
+            border-radius: 10px;
+            background: var(--bg);
+            cursor: pointer;
+            font-size: 0.88rem;
+            font-weight: 600;
+            color: var(--text);
+            transition: all 0.2s;
+        }
+        .pay-option:hover { border-color: var(--primary-light); }
+        .pay-option input { accent-color: var(--primary); width: 16px; height: 16px; }
+        .pay-option.selected { border-color: var(--primary); background: rgba(20, 83, 45, 0.06); }
+
+        .check-row {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            font-size: 0.86rem;
+            color: var(--text-muted);
+            line-height: 1.5;
+            margin-top: 4px;
+        }
+        .check-row input { accent-color: var(--primary); width: 16px; height: 16px; margin-top: 2px; flex-shrink: 0; }
+
+        /* ============ TIPS ============ */
+        .tips-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 16px;
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+        .tips-grid > div { display: flex; align-items: flex-start; gap: 10px; }
+        .tips-grid i { color: var(--success); margin-top: 3px; flex-shrink: 0; }
+
+        /* ============ FAQ ============ */
+        .faq-item {
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            margin-bottom: 8px;
+            overflow: hidden;
+            transition: all 0.2s;
+            background: var(--bg);
+        }
+        .faq-question {
+            padding: 16px 18px;
+            font-weight: 600;
+            font-size: 0.92rem;
+            color: var(--primary);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            user-select: none;
+        }
+        .faq-question:hover { background: rgba(20, 83, 45, 0.03); }
+        .faq-answer {
+            padding: 0 18px 16px;
+            font-size: 0.88rem;
+            color: var(--text-muted);
+            line-height: 1.6;
+            display: none;
+        }
+        .faq-item.open .faq-answer { display: block; }
+        .faq-item.open { border-color: var(--primary-light); background: #fff; }
+        .faq-item.open .faq-question { color: var(--accent-hover); }
+
+        /* ============ PROFILE ============ */
+        .profile-header { display: flex; align-items: center; gap: 20px; margin-bottom: 24px; }
+        .profile-avatar-large {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: var(--primary);
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            font-weight: 700;
+            border: 4px solid var(--accent);
+            flex-shrink: 0;
+        }
+        .profile-header-info h2 { font-size: 1.35rem; color: var(--primary); margin-bottom: 4px; }
+        .profile-header-info p { color: var(--text-muted); font-size: 0.9rem; }
+
+        /* ============ EMPTY STATE ============ */
+        .empty-state { text-align: center; padding: 40px 20px; color: var(--text-muted); }
+        .empty-state i { font-size: 3rem; margin-bottom: 12px; opacity: 0.45; }
+        .empty-state h4 { color: var(--primary); margin-bottom: 6px; font-size: 1rem; }
+        .empty-state p { font-size: 0.88rem; }
+
+        /* ============ TOAST ============ */
+        #toast {
+            position: fixed;
+            top: 24px;
+            right: 24px;
+            background: var(--surface);
+            border-radius: 12px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+            padding: 16px 20px;
+            display: flex;
+            align-items: flex-start;
+            gap: 14px;
+            min-width: 300px;
+            max-width: 400px;
+            z-index: 10000;
+            transform: translateX(150%);
+            transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+            border-left: 4px solid var(--primary);
+        }
+        #toast.show { transform: translateX(0); }
+        #toast.success { border-left-color: var(--success); }
+        #toast.error { border-left-color: var(--error); }
+        .toast-icon { font-size: 1.3rem; flex-shrink: 0; margin-top: 2px; }
+        .toast-content h4 { font-size: 0.95rem; font-weight: 700; margin-bottom: 2px; color: var(--text); }
+        .toast-content p { font-size: 0.85rem; color: var(--text-muted); line-height: 1.4; }
+
+        /* ============ ANIMATION ============ */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-in { animation: fadeIn 0.4s ease forwards; }
+
+        .view-section { display: none; }
+        .view-section.active { display: block; animation: fadeIn 0.3s ease; }
+
+        /* ============ RESPONSIVE TABLES → CARDS ============ */
+        @media (max-width: 700px) {
+            .responsive-table thead { display: none; }
+            .responsive-table,
+            .responsive-table tbody,
+            .responsive-table tr,
+            .responsive-table td { display: block; width: 100%; }
+            .responsive-table tr {
+                border: 1px solid var(--border);
+                border-radius: 12px;
+                margin-bottom: 12px;
+                background: var(--surface);
+                overflow: hidden;
+                box-shadow: 0 2px 8px rgba(20, 83, 45, 0.04);
+            }
+            .responsive-table tr:hover td { background: transparent; }
+            .responsive-table td {
+                border: none;
+                border-bottom: 1px dashed var(--border);
+                padding: 10px 14px;
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                gap: 12px;
+                text-align: right;
+                font-size: 0.86rem;
+            }
+            .responsive-table td:last-child { border-bottom: none; }
+            .responsive-table td::before {
+                content: attr(data-label);
+                font-size: 0.7rem;
+                text-transform: uppercase;
+                letter-spacing: 0.5px;
+                font-weight: 700;
+                color: var(--text-muted);
+                text-align: left;
+                flex-shrink: 0;
+            }
+            .responsive-table td.cell-main {
+                display: block;
+                text-align: left;
+                background: rgba(20, 83, 45, 0.03);
+                padding: 12px 14px;
+            }
+            .responsive-table td.cell-main::before { display: none; }
+            .responsive-table td.cell-actions { justify-content: flex-end; }
+            .responsive-table td.cell-actions::before { display: none; }
+            .responsive-table .doc-name { align-items: flex-start; }
+        }
+
+        /* ============ RESPONSIVE ============ */
+        @media (max-width: 1024px) {
+            .stats-grid { grid-template-columns: repeat(2, 1fr); }
+            .program-grid, .case-cards-grid { grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); }
+            .donate-layout { grid-template-columns: 1fr; }
+        }
+
+        @media (max-width: 768px) {
+            .sidebar { transform: translateX(-100%); box-shadow: none; }
+            .sidebar.open { transform: translateX(0); box-shadow: 4px 0 30px rgba(0, 0, 0, 0.25); }
+            .main-content { margin-left: 0; }
+            .menu-toggle { display: flex; }
+            .header-title { font-size: 1.05rem; }
+            .header-title span { display: none; }
+            .page-content { padding: 16px 16px 40px; }
+            .stats-grid { grid-template-columns: repeat(2, 1fr); gap: 12px; }
+            .stat-card { padding: 14px; gap: 12px; flex-direction: column; }
+            .stat-icon { width: 40px; height: 40px; font-size: 1.05rem; }
+            .stat-info h3 { font-size: 1.25rem; }
+            .stat-info p { font-size: 0.78rem; }
+            .section-header { padding: 14px 16px; }
+            .section-body { padding: 16px; }
+            .toolbar { flex-direction: column; }
+            .search-box { min-width: 100%; }
+            .filter-select { width: 100%; min-width: 0; }
+            .form-grid { grid-template-columns: 1fr; }
+            .profile-header { flex-direction: column; text-align: center; }
+            .profile-avatar-large { width: 70px; height: 70px; font-size: 1.7rem; }
+            #toast { right: 12px; left: 12px; top: 12px; min-width: unset; max-width: unset; }
+            .appointment-item { flex-wrap: wrap; }
+            .appointment-info { flex-basis: calc(100% - 70px); }
+            .message-time { display: none; }
+            .program-grid, .case-cards-grid { grid-template-columns: 1fr; }
+            .section-actions { width: 100%; }
+            .section-actions .btn { flex: 1; justify-content: center; }
+        }
+
+        @media (max-width: 480px) {
+            .header-profile-info { display: none; }
+            .top-header { padding: 12px 14px; }
+            .header-btn { width: 36px; height: 36px; }
+            .stats-grid { grid-template-columns: 1fr; }
+            .stat-card { flex-direction: row; align-items: center; }
+            .amount-grid { grid-template-columns: repeat(2, 1fr); }
+            .freq-btn { min-width: 100%; }
+            .summary-total .value { font-size: 1.35rem; }
+            .action-btn { width: 32px; height: 32px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar(false)"></div>
+    <div id="toast">
+        <div class="toast-icon" id="toastIcon">ℹ️</div>
+        <div class="toast-content"><h4 id="toastTitle">Notification</h4><p id="toastMsg">Message</p></div>
+    </div>
+
+    <!-- ================= SIDEBAR ================= -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <img src="./images/stackly_logo.webp" alt="Stackly Charity" class="logo-img">
+        </div>
+        <nav class="nav-menu">
+            <div class="nav-section">
+                <div class="nav-section-label" onclick="toggleSection(this)">Main <i class="fas fa-chevron-down toggle-icon"></i></div>
+                <div class="nav-items-container">
+                    <button class="nav-item active" data-view="dashboard" onclick="switchView('dashboard')"><i class="fas fa-th-large"></i> Dashboard</button>
+                </div>
+            </div>
+            <div class="nav-section">
+                <div class="nav-section-label" onclick="toggleSection(this)">Giving <i class="fas fa-chevron-down toggle-icon"></i></div>
+                <div class="nav-items-container">
+                    <button class="nav-item" data-view="donations" onclick="switchView('donations')"><i class="fas fa-hand-holding-heart"></i> My Donations <span class="nav-badge neutral" id="navDonationCount">10</span></button>
+                    <button class="nav-item" data-view="donate" onclick="switchView('donate')"><i class="fas fa-donate"></i> Make a Donation</button>
+                    <button class="nav-item" data-view="receipts" onclick="switchView('receipts')"><i class="fas fa-file-invoice-dollar"></i> Tax Receipts (80G)</button>
+                    <button class="nav-item" data-view="recurring" onclick="switchView('recurring')"><i class="fas fa-sync-alt"></i> Recurring Giving <span class="nav-badge neutral" id="navRecurringCount">3</span></button>
+                </div>
+            </div>
+            <div class="nav-section">
+                <div class="nav-section-label" onclick="toggleSection(this)">Programs <i class="fas fa-chevron-down toggle-icon"></i></div>
+                <div class="nav-items-container">
+                    <button class="nav-item" data-view="programs" onclick="switchView('programs')"><i class="fas fa-seedling"></i> Our Programs <span class="nav-badge neutral">7</span></button>
+                    <button class="nav-item" data-view="volunteer" onclick="switchView('volunteer')"><i class="fas fa-hands-helping"></i> Volunteering <span class="nav-badge neutral">3</span></button>
+                </div>
+            </div>
+            <div class="nav-section">
+                <div class="nav-section-label" onclick="toggleSection(this)">Communication <i class="fas fa-chevron-down toggle-icon"></i></div>
+                <div class="nav-items-container">
+                    <button class="nav-item" data-view="messages" onclick="switchView('messages')"><i class="fas fa-envelope"></i> Messages <span class="nav-badge" id="navMsgCount">4</span></button>
+                    <button class="nav-item" data-view="activity" onclick="switchView('activity')"><i class="fas fa-clock"></i> Activity</button>
+                </div>
+            </div>
+            <div class="nav-section">
+                <div class="nav-section-label" onclick="toggleSection(this)">Account <i class="fas fa-chevron-down toggle-icon"></i></div>
+                <div class="nav-items-container">
+                    <button class="nav-item" data-view="profile" onclick="switchView('profile')"><i class="fas fa-user-cog"></i> Profile</button>
+                    <button class="nav-item" data-view="help" onclick="switchView('help')"><i class="fas fa-question-circle"></i> Help &amp; Support</button>
+                </div>
+            </div>
+            <div style="margin-top:12px; padding-top:12px; border-top:1px solid rgba(255,255,255,0.1);">
+                <button class="nav-item" onclick="handleLogout()" style="color:rgba(255,120,120,0.95);"><i class="fas fa-sign-out-alt"></i> Sign Out</button>
+            </div>
+        </nav>
+        <div class="sidebar-footer">
+            <div class="user-mini">
+                <div class="user-mini-avatar" id="sidebarAvatar">U</div>
+                <div class="user-mini-info">
+                    <div class="user-mini-name" id="sidebarName">Donor</div>
+                    <div class="user-mini-role" id="sidebarRole">donor@gmail.com</div>
+                </div>
+            </div>
+        </div>
+    </aside>
+
+    <!-- ================= MAIN ================= -->
+    <main class="main-content">
+        <header class="top-header">
+            <div class="header-left">
+                <button class="menu-toggle" onclick="toggleSidebar()" aria-label="Open menu"><i class="fas fa-bars"></i></button>
+                <h1 class="header-title" id="pageTitle">Dashboard <span>— Overview</span></h1>
+            </div>
+            <div class="header-right">
+                <button class="header-btn" onclick="showToast('info','No new notifications','You are all caught up!')" aria-label="Notifications">
+                    <i class="fas fa-bell"></i><span class="badge">2</span>
+                </button>
+                <div class="header-profile" onclick="switchView('profile')">
+                    <div class="header-profile-avatar" id="headerAvatar">U</div>
+                    <div class="header-profile-info">
+                        <div class="header-profile-name" id="headerName">Donor</div>
+                        <div class="header-profile-role">Donor &amp; Volunteer</div>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <div class="page-content">
+
+            <!-- ============ DASHBOARD ============ -->
+            <div class="view-section active" id="view-dashboard">
+                <div class="stats-grid">
+                    <div class="stat-card animate-in" style="animation-delay:0.05s">
+                        <div class="stat-icon green"><i class="fas fa-hand-holding-usd"></i></div>
+                        <div class="stat-info"><h3 id="statTotalDonated">₹0</h3><p>Total Contributed</p></div>
+                    </div>
+                    <div class="stat-card animate-in" style="animation-delay:0.1s">
+                        <div class="stat-icon blue"><i class="fas fa-users"></i></div>
+                        <div class="stat-info"><h3 id="statLives">0</h3><p>Lives Impacted</p></div>
+                    </div>
+                    <div class="stat-card animate-in" style="animation-delay:0.15s">
+                        <div class="stat-icon amber"><i class="fas fa-seedling"></i></div>
+                        <div class="stat-info"><h3 id="statPrograms">0</h3><p>Programs Supported</p></div>
+                    </div>
+                    <div class="stat-card animate-in" style="animation-delay:0.2s">
+                        <div class="stat-icon purple"><i class="fas fa-hands-helping"></i></div>
+                        <div class="stat-info"><h3 id="statHours">0</h3><p>Volunteer Hours</p></div>
+                    </div>
+                </div>
+
+                <div class="section-card animate-in" style="animation-delay:0.25s">
+                    <div class="section-header">
+                        <div class="section-title"><i class="fas fa-receipt"></i> Recent Donations</div>
+                        <div class="section-actions">
+                            <button class="btn btn-outline btn-sm" onclick="switchView('donations')"><i class="fas fa-list"></i> View All</button>
+                            <button class="btn btn-accent btn-sm" onclick="switchView('donate')"><i class="fas fa-heart"></i> Donate</button>
+                        </div>
+                    </div>
+                    <div class="section-body"><div id="recentDonationsList"></div></div>
+                </div>
+
+                <div class="section-card animate-in" style="animation-delay:0.3s">
+                    <div class="section-header">
+                        <div class="section-title"><i class="fas fa-chart-line"></i> Programs You Support</div>
+                        <div class="section-actions"><button class="btn btn-outline btn-sm" onclick="switchView('programs')"><i class="fas fa-seedling"></i> All Programs</button></div>
+                    </div>
+                    <div class="section-body"><div id="supportedProgramsList"></div></div>
+                </div>
+
+                <div class="section-card animate-in" style="animation-delay:0.35s">
+                    <div class="section-header"><div class="section-title"><i class="fas fa-bolt"></i> Quick Actions</div></div>
+                    <div class="section-body">
+                        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;">
+                            <button class="btn btn-outline btn-block" onclick="switchView('donate')"><i class="fas fa-donate"></i> Donate Now</button>
+                            <button class="btn btn-outline btn-block" onclick="switchView('volunteer')"><i class="fas fa-hands-helping"></i> Volunteer</button>
+                            <button class="btn btn-outline btn-block" onclick="switchView('receipts')"><i class="fas fa-file-download"></i> 80G Receipts</button>
+                            <button class="btn btn-outline btn-block" onclick="switchView('help')"><i class="fas fa-headset"></i> Get Support</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ============ MY DONATIONS ============ -->
+            <div class="view-section" id="view-donations">
+                <div class="section-card">
+                    <div class="section-header">
+                        <div class="section-title"><i class="fas fa-hand-holding-heart"></i> My Donations</div>
+                        <div class="section-actions">
+                            <button class="btn btn-accent btn-sm" onclick="switchView('donate')"><i class="fas fa-plus"></i> New Donation</button>
+                        </div>
+                    </div>
+                    <div class="section-body">
+                        <div class="toolbar">
+                            <div class="search-box">
+                                <i class="fas fa-search"></i>
+                                <input type="text" id="donSearch" placeholder="Search by receipt or program..." oninput="renderDonations()">
+                            </div>
+                            <select class="filter-select" id="donStatusFilter" onchange="renderDonations()">
+                                <option value="all">All Status</option>
+                                <option value="completed">Completed</option>
+                                <option value="pending">Pending</option>
+                                <option value="failed">Failed</option>
+                            </select>
+                            <select class="filter-select" id="donProgramFilter" onchange="renderDonations()">
+                                <option value="all">All Programs</option>
+                            </select>
+                        </div>
+                        <div class="table-scroll">
+                            <table class="doc-table responsive-table">
+                                <thead>
+                                    <tr>
+                                        <th>Receipt / Program</th>
+                                        <th>Date</th>
+                                        <th>Type</th>
+                                        <th>Amount</th>
+                                        <th>Status</th>
+                                        <th style="text-align:right;">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="donationsTableBody"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ============ MAKE A DONATION ============ -->
+            <div class="view-section" id="view-donate">
+                <div class="donate-layout">
+                    <div>
+                        <div class="section-card">
+                            <div class="section-header">
+                                <div class="section-title"><i class="fas fa-donate"></i> Make a Donation</div>
+                            </div>
+                            <div class="section-body">
+                                <div class="form-group full">
+                                    <label>Donation Frequency</label>
+                                    <div class="freq-toggle">
+                                        <button type="button" class="freq-btn active" data-freq="One-time" onclick="setFrequency(this)">One-time</button>
+                                        <button type="button" class="freq-btn" data-freq="Monthly" onclick="setFrequency(this)">Monthly</button>
+                                    </div>
+                                </div>
+
+                                <div class="form-group full" style="margin-top:18px;">
+                                    <label>Select Amount (INR)</label>
+                                    <div class="amount-grid" id="amountGrid">
+                                        <button type="button" class="amount-btn" onclick="setAmount(this,500)">₹500</button>
+                                        <button type="button" class="amount-btn active" onclick="setAmount(this,1000)">₹1,000</button>
+                                        <button type="button" class="amount-btn" onclick="setAmount(this,2500)">₹2,500</button>
+                                        <button type="button" class="amount-btn" onclick="setAmount(this,5000)">₹5,000</button>
+                                        <button type="button" class="amount-btn" onclick="setAmount(this,10000)">₹10,000</button>
+                                    </div>
+                                    <input type="number" id="customAmount" placeholder="Or enter a custom amount" value="1000" min="1"
+                                        inputmode="numeric" style="margin-top:12px;"
+                                        oninput="this.value = this.value.replace(/[^0-9]/g,''); clearAmountSelection(); updateDonationSummary();">
+                                </div>
+
+                                <div class="form-grid" style="margin-top:18px;">
+                                    <div class="form-group full">
+                                        <label>Choose a Cause / Program</label>
+                                        <select id="donateProgram" onchange="updateDonationSummary()"></select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Full Name</label>
+                                        <input type="text" id="donorName" placeholder="Your full name">
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Email Address</label>
+                                        <input type="email" id="donorEmail" placeholder="you@example.com">
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Phone Number</label>
+                                        <input type="tel" id="donorPhone" placeholder="10-digit mobile" maxlength="10" inputmode="numeric"
+                                            oninput="this.value = this.value.replace(/[^0-9]/g,'')">
+                                    </div>
+                                    <div class="form-group">
+                                        <label>PAN (for 80G receipt)</label>
+                                        <input type="text" id="donorPan" placeholder="ABCDE1234F" maxlength="10"
+                                            style="text-transform:uppercase;"
+                                            oninput="this.value = this.value.toUpperCase().replace(/[^A-Z0-9]/g,'')">
+                                    </div>
+                                </div>
+
+                                <div class="form-group full" style="margin-top:18px;">
+                                    <label>Payment Method</label>
+                                    <div class="pay-methods" id="payMethods">
+                                        <label class="pay-option selected"><input type="radio" name="payMethod" value="UPI" checked onchange="selectPay(this)"> <i class="fas fa-mobile-alt"></i> UPI</label>
+                                        <label class="pay-option"><input type="radio" name="payMethod" value="Credit Card" onchange="selectPay(this)"> <i class="fas fa-credit-card"></i> Card</label>
+                                        <label class="pay-option"><input type="radio" name="payMethod" value="Net Banking" onchange="selectPay(this)"> <i class="fas fa-university"></i> Net Banking</label>
+                                        <label class="pay-option"><input type="radio" name="payMethod" value="Bank Transfer" onchange="selectPay(this)"> <i class="fas fa-exchange-alt"></i> Bank Transfer</label>
+                                    </div>
+                                </div>
+
+                                <div class="check-row" style="margin-top:16px;">
+                                    <input type="checkbox" id="anonymous">
+                                    <label for="anonymous" style="cursor:pointer;">Make this donation anonymously (your name will not be published in our donor list)</label>
+                                </div>
+                                <div class="check-row">
+                                    <input type="checkbox" id="taxReceipt" checked>
+                                    <label for="taxReceipt" style="cursor:pointer;">Send me an 80G tax exemption receipt by email</label>
+                                </div>
+
+                                <div style="margin-top:24px;display:flex;gap:10px;justify-content:flex-end;flex-wrap:wrap;">
+                                    <button class="btn btn-outline" onclick="switchView('dashboard')">Cancel</button>
+                                    <button class="btn btn-accent" onclick="submitDonation()"><i class="fas fa-heart"></i> Donate Now</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="section-card">
+                            <div class="section-header"><div class="section-title"><i class="fas fa-lightbulb"></i> Giving Tips</div></div>
+                            <div class="section-body">
+                                <div class="tips-grid">
+                                    <div><i class="fas fa-check-circle"></i><span>Add your PAN to instantly generate an 80G tax exemption receipt</span></div>
+                                    <div><i class="fas fa-check-circle"></i><span>Choose monthly giving to provide steady support to a program</span></div>
+                                    <div><i class="fas fa-check-circle"></i><span>100% of your contribution reaches the field — admin costs are separately funded</span></div>
+                                    <div><i class="fas fa-check-circle"></i><span>You can pause or cancel recurring donations anytime</span></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div>
+                        <div class="summary-box">
+                            <h3><i class="fas fa-receipt"></i> Donation Summary</h3>
+                            <div class="summary-row"><span>Frequency</span><span id="sumFreq">One-time</span></div>
+                            <div class="summary-row"><span>Program</span><span id="sumProgram">—</span></div>
+                            <div class="summary-row"><span>Payment Method</span><span id="sumMethod">UPI</span></div>
+                            <div class="summary-row"><span>80G Receipt</span><span id="sumReceipt">Yes</span></div>
+                            <div class="summary-total">
+                                <span class="label">Total Amount</span>
+                                <span class="value" id="sumAmount">₹1,000</span>
+                            </div>
+                            <div class="impact-note">
+                                <i class="fas fa-seedling"></i>
+                                <span id="impactText">Your contribution helps us keep our programs running for the communities that need them most.</span>
+                            </div>
+                        </div>
+
+                        <div class="section-card" style="margin-top:24px;">
+                            <div class="section-header"><div class="section-title"><i class="fas fa-shield-alt"></i> Secure Giving</div></div>
+                            <div class="section-body">
+                                <div style="display:flex;flex-direction:column;gap:14px;font-size:0.87rem;color:var(--text-muted);">
+                                    <div style="display:flex;gap:10px;"><i class="fas fa-lock" style="color:var(--success);margin-top:3px;"></i><span>All payments are processed over a secure, encrypted connection.</span></div>
+                                    <div style="display:flex;gap:10px;"><i class="fas fa-certificate" style="color:var(--success);margin-top:3px;"></i><span>Registered under Section 12A &amp; 80G of the Income Tax Act.</span></div>
+                                    <div style="display:flex;gap:10px;"><i class="fas fa-file-alt" style="color:var(--success);margin-top:3px;"></i><span>Annual impact and audited financial reports published every year.</span></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ============ TAX RECEIPTS ============ -->
+            <div class="view-section" id="view-receipts">
+                <div class="stats-grid" style="grid-template-columns:repeat(auto-fit,minmax(220px,1fr));">
+                    <div class="stat-card">
+                        <div class="stat-icon green"><i class="fas fa-file-invoice-dollar"></i></div>
+                        <div class="stat-info"><h3 id="rcptCount">0</h3><p>Receipts Issued</p></div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon teal"><i class="fas fa-rupee-sign"></i></div>
+                        <div class="stat-info"><h3 id="rcptTotal">₹0</h3><p>Total 80G Eligible</p></div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon amber"><i class="fas fa-hourglass-half"></i></div>
+                        <div class="stat-info"><h3 id="rcptProcessing">0</h3><p>Processing</p></div>
+                    </div>
+                </div>
+
+                <div class="section-card">
+                    <div class="section-header">
+                        <div class="section-title"><i class="fas fa-file-invoice-dollar"></i> 80G Tax Receipts</div>
+                        <div class="section-actions">
+                            <select class="filter-select" id="fyFilter" onchange="renderReceipts()">
+                                <option value="all">All Financial Years</option>
+                                <option value="2026-27">FY 2026-27</option>
+                                <option value="2025-26">FY 2025-26</option>
+                            </select>
+                            <button class="btn btn-outline btn-sm" onclick="showToast('success','Download','Downloading all receipts as a single PDF...')"><i class="fas fa-download"></i> Download All</button>
+                        </div>
+                    </div>
+                    <div class="section-body">
+                        <div class="table-scroll">
+                            <table class="doc-table responsive-table">
+                                <thead>
+                                    <tr>
+                                        <th>Receipt No.</th>
+                                        <th>Against Donation</th>
+                                        <th>Date</th>
+                                        <th>Amount</th>
+                                        <th>Status</th>
+                                        <th style="text-align:right;">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="receiptsTableBody"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ============ RECURRING GIVING ============ -->
+            <div class="view-section" id="view-recurring">
+                <div class="section-card">
+                    <div class="section-header">
+                        <div class="section-title"><i class="fas fa-sync-alt"></i> Recurring Giving</div>
+                        <div class="section-actions">
+                            <button class="btn btn-accent btn-sm" onclick="switchView('donate')"><i class="fas fa-plus"></i> Start New</button>
+                        </div>
+                    </div>
+                    <div class="section-body">
+                        <div class="table-scroll">
+                            <table class="doc-table responsive-table">
+                                <thead>
+                                    <tr>
+                                        <th>Program</th>
+                                        <th>Frequency</th>
+                                        <th>Amount</th>
+                                        <th>Next Charge</th>
+                                        <th>Status</th>
+                                        <th style="text-align:right;">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="recurringTableBody"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                <div class="section-card">
+                    <div class="section-header"><div class="section-title"><i class="fas fa-info-circle"></i> About Recurring Giving</div></div>
+                    <div class="section-body">
+                        <p style="font-size:0.9rem;color:var(--text-muted);line-height:1.7;">
+                            Monthly giving is the most effective way to support our work — it lets us plan long-term programs
+                            instead of reacting month to month. You can change the amount, switch programs, pause, or cancel at
+                            any time. Every charge generates an automatic 80G receipt.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ============ PROGRAMS ============ -->
+            <div class="view-section" id="view-programs">
+                <div class="section-card">
+                    <div class="section-header">
+                        <div class="section-title"><i class="fas fa-seedling"></i> Our Programs</div>
+                        <div class="section-actions">
+                            <button class="btn btn-accent btn-sm" onclick="switchView('donate')"><i class="fas fa-heart"></i> Support a Program</button>
+                        </div>
+                    </div>
+                    <div class="section-body">
+                        <div class="program-grid" id="programsGrid"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ============ VOLUNTEERING ============ -->
+            <div class="view-section" id="view-volunteer">
+                <div class="stats-grid" style="grid-template-columns:repeat(auto-fit,minmax(220px,1fr));">
+                    <div class="stat-card">
+                        <div class="stat-icon purple"><i class="fas fa-hands-helping"></i></div>
+                        <div class="stat-info"><h3 id="volHours">0</h3><p>Hours Volunteered</p></div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon blue"><i class="fas fa-calendar-check"></i></div>
+                        <div class="stat-info"><h3 id="volUpcoming">0</h3><p>Upcoming Shifts</p></div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon green"><i class="fas fa-award"></i></div>
+                        <div class="stat-info"><h3 id="volBadge">Bronze</h3><p>Volunteer Tier</p></div>
+                    </div>
+                </div>
+
+                <div class="section-card">
+                    <div class="section-header">
+                        <div class="section-title"><i class="fas fa-calendar-check"></i> My Volunteer Shifts</div>
+                        <div class="section-actions">
+                            <button class="btn btn-primary btn-sm" onclick="showToast('info','Volunteer Signup','Opening the volunteer opportunity board...')"><i class="fas fa-plus"></i> Sign Up</button>
+                        </div>
+                    </div>
+                    <div class="section-body"><div id="volunteerList"></div></div>
+                </div>
+            </div>
+
+            <!-- ============ MESSAGES ============ -->
+            <div class="view-section" id="view-messages">
+                <div class="section-card">
+                    <div class="section-header">
+                        <div class="section-title"><i class="fas fa-envelope"></i> Messages</div>
+                        <div class="section-actions">
+                            <button class="btn btn-primary btn-sm" onclick="showToast('info','Compose','Opening message composer...')"><i class="fas fa-pen"></i> Compose</button>
+                        </div>
+                    </div>
+                    <div class="section-body"><div id="messagesList"></div></div>
+                </div>
+            </div>
+
+            <!-- ============ ACTIVITY ============ -->
+            <div class="view-section" id="view-activity">
+                <div class="section-card">
+                    <div class="section-header"><div class="section-title"><i class="fas fa-history"></i> Recent Activity</div></div>
+                    <div class="section-body"><div class="activity-list" id="activityList"></div></div>
+                </div>
+            </div>
+
+            <!-- ============ PROFILE ============ -->
+            <div class="view-section" id="view-profile">
+                <div class="section-card">
+                    <div class="section-header"><div class="section-title"><i class="fas fa-user"></i> Profile Settings</div></div>
+                    <div class="section-body">
+                        <div class="profile-header">
+                            <div class="profile-avatar-large" id="profileAvatar">U</div>
+                            <div class="profile-header-info">
+                                <h2 id="profileName">Donor Name</h2>
+                                <p id="profileEmail">donor@gmail.com</p>
+                            </div>
+                        </div>
+                        <div class="form-grid">
+                            <div class="form-group"><label>Full Name</label><input type="text" id="editName" value=""></div>
+                            <div class="form-group"><label>Email Address</label><input type="email" id="editEmail" value="" disabled></div>
+                            <div class="form-group">
+                                <label>Phone Number</label>
+                                <input type="tel" id="editPhone" value="" maxlength="10" inputmode="numeric"
+                                    oninput="this.value = this.value.replace(/[^0-9]/g,'')" placeholder="10-digit mobile number">
+                            </div>
+                            <div class="form-group">
+                                <label>PAN (for 80G)</label>
+                                <input type="text" id="editPan" placeholder="ABCDE1234F" maxlength="10" style="text-transform:uppercase;"
+                                    oninput="this.value = this.value.toUpperCase().replace(/[^A-Z0-9]/g,'')">
+                            </div>
+                            <div class="form-group full"><label>Address</label><input type="text" id="editAddress" placeholder="Enter your address"></div>
+                            <div class="form-group">
+                                <label>City</label>
+                                <input type="text" id="editCity" placeholder="City"
+                                    oninput="this.value = this.value.replace(/[^a-zA-Z\s]/g,'')">
+                            </div>
+                            <div class="form-group">
+                                <label>Postal Code</label>
+                                <input type="text" id="editPostal" placeholder="000000" inputmode="numeric" maxlength="6"
+                                    oninput="this.value = this.value.replace(/[^0-9]/g,'')">
+                            </div>
+                            <div class="form-group"><label>Account Type</label><input type="text" value="Donor &amp; Volunteer" disabled></div>
+                            <div class="form-group"><label>Member Since</label><input type="text" value="April 2024" disabled></div>
+                        </div>
+                        <div style="margin-top:24px;display:flex;gap:10px;justify-content:flex-end;flex-wrap:wrap;">
+                            <button class="btn btn-outline" onclick="resetProfile()">Reset</button>
+                            <button class="btn btn-primary" onclick="saveProfile()"><i class="fas fa-save"></i> Save Changes</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="section-card">
+                    <div class="section-header"><div class="section-title"><i class="fas fa-shield-alt"></i> Security</div></div>
+                    <div class="section-body">
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label>Current Password</label>
+                                <div class="pwd-wrap">
+                                    <input type="password" id="currPassword" placeholder="••••••••">
+                                    <i class="fas fa-eye toggle-eye"
+                                       onclick="togglePassword('currPassword', this)"
+                                       aria-label="Show password"></i>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label>New Password</label>
+                                <div class="pwd-wrap">
+                                    <input type="password" id="newPassword" placeholder="Min 8 chars with special">
+                                    <i class="fas fa-eye toggle-eye"
+                                       onclick="togglePassword('newPassword', this)"
+                                       aria-label="Show password"></i>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label>Confirm New Password</label>
+                                <div class="pwd-wrap">
+                                    <input type="password" id="confirmPassword" placeholder="••••••••">
+                                    <i class="fas fa-eye toggle-eye"
+                                       onclick="togglePassword('confirmPassword', this)"
+                                       aria-label="Show password"></i>
+                                </div>
+                            </div>
+                        </div>
+                        <div style="margin-top:16px;display:flex;justify-content:flex-end;">
+                            <button class="btn btn-primary" onclick="changePassword()"><i class="fas fa-key"></i> Update Password</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ============ HELP ============ -->
+            <div class="view-section" id="view-help">
+                <div class="section-card">
+                    <div class="section-header"><div class="section-title"><i class="fas fa-question-circle"></i> Frequently Asked Questions</div></div>
+                    <div class="section-body"><div id="faqList"></div></div>
+                </div>
+                <div class="section-card">
+                    <div class="section-header"><div class="section-title"><i class="fas fa-headset"></i> Contact Support</div></div>
+                    <div class="section-body">
+                        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;">
+                            <button class="btn btn-outline btn-block" style="padding:16px;" onclick="showToast('info','Live Chat','Connecting you to our support team...')"><i class="fas fa-comment-dots" style="font-size:1.2rem;"></i> Live Chat</button>
+                            <button class="btn btn-outline btn-block" style="padding:16px;" onclick="showToast('info','Email','Opening email composer...')"><i class="fas fa-envelope" style="font-size:1.2rem;"></i> Email Support</button>
+                            <button class="btn btn-outline btn-block" style="padding:16px;" onclick="showToast('info','Phone','Calling our helpline...')"><i class="fas fa-phone" style="font-size:1.2rem;"></i> Call Helpline</button>
+                            <button class="btn btn-outline btn-block" style="padding:16px;" onclick="showToast('info','Reports','Opening annual reports and audits...')"><i class="fas fa-book" style="font-size:1.2rem;"></i> Reports &amp; Audits</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <script>
+        /* ==================================================
+           DATA STORE — Stackly Charity (NGO & Nonprofit)
+        ================================================== */
+        let donations = [
+            { id: 1, receipt: 'DON-2026-0451', program: 'Education for All', date: '2026-08-12', amount: 5000, method: 'UPI', status: 'completed', type: 'One-time' },
+            { id: 2, receipt: 'DON-2026-0438', program: 'Clean Water Initiative', date: '2026-08-01', amount: 2500, method: 'Credit Card', status: 'completed', type: 'Monthly' },
+            { id: 3, receipt: 'DON-2026-0421', program: 'Food Relief Drive', date: '2026-07-25', amount: 10000, method: 'Bank Transfer', status: 'completed', type: 'One-time' },
+            { id: 4, receipt: 'DON-2026-0398', program: 'Healthcare Camps', date: '2026-07-14', amount: 1500, method: 'UPI', status: 'pending', type: 'One-time' },
+            { id: 5, receipt: 'DON-2026-0377', program: 'Education for All', date: '2026-07-02', amount: 2500, method: 'Credit Card', status: 'completed', type: 'Monthly' },
+            { id: 6, receipt: 'DON-2026-0350', program: 'Women Empowerment', date: '2026-06-18', amount: 7500, method: 'Net Banking', status: 'completed', type: 'One-time' },
+            { id: 7, receipt: 'DON-2026-0329', program: 'Disaster Relief Fund', date: '2026-06-05', amount: 3000, method: 'UPI', status: 'failed', type: 'One-time' },
+            { id: 8, receipt: 'DON-2026-0301', program: 'Clean Water Initiative', date: '2026-05-22', amount: 2500, method: 'Credit Card', status: 'completed', type: 'Monthly' },
+            { id: 9, receipt: 'DON-2026-0277', program: 'Animal Welfare', date: '2026-05-09', amount: 1000, method: 'UPI', status: 'completed', type: 'One-time' },
+            { id: 10, receipt: 'DON-2026-0245', program: 'Education for All', date: '2026-04-26', amount: 2500, method: 'Credit Card', status: 'completed', type: 'Monthly' }
+        ];
+
+        let receipts = [
+            { id: 1, number: '80G/2026-27/0451', donation: 'DON-2026-0451', fy: '2026-27', date: '2026-08-12', amount: 5000, status: 'issued' },
+            { id: 2, number: '80G/2026-27/0438', donation: 'DON-2026-0438', fy: '2026-27', date: '2026-08-01', amount: 2500, status: 'issued' },
+            { id: 3, number: '80G/2026-27/0421', donation: 'DON-2026-0421', fy: '2026-27', date: '2026-07-25', amount: 10000, status: 'issued' },
+            { id: 4, number: '80G/2026-27/0398', donation: 'DON-2026-0398', fy: '2026-27', date: '2026-07-14', amount: 1500, status: 'processing' },
+            { id: 5, number: '80G/2026-27/0377', donation: 'DON-2026-0377', fy: '2026-27', date: '2026-07-02', amount: 2500, status: 'issued' },
+            { id: 6, number: '80G/2025-26/0350', donation: 'DON-2026-0350', fy: '2025-26', date: '2026-06-18', amount: 7500, status: 'issued' },
+            { id: 7, number: '80G/2025-26/0301', donation: 'DON-2026-0301', fy: '2025-26', date: '2026-05-22', amount: 2500, status: 'issued' },
+            { id: 8, number: '80G/2025-26/0277', donation: 'DON-2026-0277', fy: '2025-26', date: '2026-05-09', amount: 1000, status: 'issued' }
+        ];
+
+        let programs = [
+            { id: 1, name: 'Education for All', category: 'Education', icon: 'fa-graduation-cap', raised: 780000, goal: 1200000, beneficiaries: 2450, status: 'active', description: 'Scholarships, books and digital classrooms for children from low-income communities.' },
+            { id: 2, name: 'Clean Water Initiative', category: 'Water and Sanitation', icon: 'fa-tint', raised: 540000, goal: 800000, beneficiaries: 1800, status: 'active', description: 'Borewells, filtration units and hygiene training for villages without safe water.' },
+            { id: 3, name: 'Food Relief Drive', category: 'Hunger Relief', icon: 'fa-utensils', raised: 920000, goal: 1000000, beneficiaries: 5600, status: 'active', description: 'Monthly ration kits and community kitchens for vulnerable families.' },
+            { id: 4, name: 'Healthcare Camps', category: 'Health', icon: 'fa-stethoscope', raised: 310000, goal: 600000, beneficiaries: 1200, status: 'active', description: 'Free medical camps, screenings and medicines in rural districts.' },
+            { id: 5, name: 'Women Empowerment', category: 'Livelihood', icon: 'fa-female', raised: 465000, goal: 500000, beneficiaries: 640, status: 'active', description: 'Skill training, micro-enterprise grants and self-help group support.' },
+            { id: 6, name: 'Animal Welfare', category: 'Animal Welfare', icon: 'fa-paw', raised: 180000, goal: 400000, beneficiaries: 900, status: 'active', description: 'Rescue, sterilisation and shelter support for street animals.' },
+            { id: 7, name: 'Disaster Relief Fund', category: 'Emergency Response', icon: 'fa-house-damage', raised: 250000, goal: 250000, beneficiaries: 3100, status: 'completed', description: 'Rapid response kits, shelter material and rebuilding support after floods.' }
+        ];
+
+        let volunteerShifts = [
+            { id: 1, date: '2026-08-16', day: '16', month: 'Aug', title: 'Weekend Teaching Session', location: 'Govt. Primary School, Sector 12', time: '9:00 AM - 1:00 PM', role: 'Teaching Volunteer', status: 'upcoming' },
+            { id: 2, date: '2026-08-23', day: '23', month: 'Aug', title: 'Community Kitchen Drive', location: 'Stackly Community Kitchen, Ward 7', time: '8:00 AM - 12:00 PM', role: 'Food Distribution', status: 'upcoming' },
+            { id: 3, date: '2026-08-30', day: '30', month: 'Aug', title: 'Health Camp Assistance', location: 'Rural Health Centre, Block C', time: '10:00 AM - 4:00 PM', role: 'Registration Desk', status: 'upcoming' },
+            { id: 4, date: '2026-07-19', day: '19', month: 'Jul', title: 'Monsoon Relief Packing', location: 'Stackly Warehouse, Unit 3', time: '9:00 AM - 3:00 PM', role: 'Packing Team', status: 'completed', hours: 6 },
+            { id: 5, date: '2026-06-28', day: '28', month: 'Jun', title: 'Tree Plantation Drive', location: 'City Green Belt, Zone 4', time: '7:00 AM - 11:00 AM', role: 'Plantation Team', status: 'completed', hours: 4 },
+            { id: 6, date: '2026-05-17', day: '17', month: 'May', title: 'Awareness Street Campaign', location: 'Central Market Area', time: '4:00 PM - 8:00 PM', role: 'Outreach Volunteer', status: 'completed', hours: 4 }
+        ];
+
+        let messages = [
+            { id: 301, sender: 'Priya Nair — Program Head', subject: 'Your support built a new classroom', preview: 'Thanks to donors like you, we inaugurated a digital classroom at Sector 12 last week...', time: '10:42 AM', unread: true, initials: 'PN', color: '#2d6a4f' },
+            { id: 302, sender: 'Rahul Verma — Volunteer Lead', subject: 'Volunteer shift confirmation', preview: 'Your shift for the Weekend Teaching Session on 16 August is confirmed. Please carry...', time: 'Yesterday', unread: true, initials: 'RV', color: '#805ad5' },
+            { id: 303, sender: 'Accounts Department', subject: 'Your 80G receipt for July is ready', preview: 'Receipt 80G/2026-27/0421 against donation DON-2026-0421 has been issued...', time: '2 days ago', unread: true, initials: 'AD', color: '#d69e2e' },
+            { id: 304, sender: 'Meera Iyer — Field Coordinator', subject: 'Clean Water Initiative update', preview: 'Two more filtration units have been installed in villages near Block C...', time: '3 days ago', unread: true, initials: 'MI', color: '#319795' },
+            { id: 305, sender: 'Stackly Newsletter', subject: 'August impact report is here', preview: 'This month our community reached 5,600 people through food relief alone...', time: '5 days ago', unread: false, initials: 'SN', color: '#e53e3e' },
+            { id: 306, sender: 'Support Team', subject: 'Your query has been resolved', preview: 'Thank you for reaching out about recurring donations. Your query has been resolved...', time: '1 week ago', unread: false, initials: 'ST', color: '#38a169' }
+        ];
+
+        let recurringGiving = [
+            { id: 501, program: 'Education for All', frequency: 'Monthly', amount: 2500, nextDate: '2026-09-01', status: 'active', method: 'Credit Card' },
+            { id: 502, program: 'Clean Water Initiative', frequency: 'Monthly', amount: 2500, nextDate: '2026-09-01', status: 'active', method: 'Credit Card' },
+            { id: 503, program: 'Food Relief Drive', frequency: 'Quarterly', amount: 5000, nextDate: '2026-10-05', status: 'paused', method: 'Net Banking' }
+        ];
+
+        let activities = [
+            { icon: 'fa-heart', color: 'success', text: 'You donated <strong>₹5,000</strong> to <strong>Education for All</strong>', time: '2 hours ago' },
+            { icon: 'fa-file-invoice-dollar', color: 'info', text: '80G receipt <strong>80G/2026-27/0451</strong> was issued to you', time: '2 hours ago' },
+            { icon: 'fa-hands-helping', color: 'purple', text: 'You signed up for <strong>Weekend Teaching Session</strong>', time: '5 hours ago' },
+            { icon: 'fa-tint', color: 'teal', text: 'New update posted on <strong>Clean Water Initiative</strong>', time: '1 day ago' },
+            { icon: 'fa-exclamation-circle', color: 'error', text: 'Donation <strong>DON-2026-0329</strong> failed — payment retry needed', time: '2 days ago' },
+            { icon: 'fa-seedling', color: 'success', text: '<strong>Healthcare Camps</strong> reached 300 new beneficiaries', time: '3 days ago' },
+            { icon: 'fa-download', color: 'info', text: 'You downloaded the <strong>Annual Impact Report 2025-26</strong>', time: '1 week ago' }
+        ];
+
+        let faqs = [
+            { q: 'How do I get my 80G tax exemption receipt?', a: 'Receipts are generated automatically within 24 hours of a successful donation and emailed to you. You can also download every receipt from the <strong>Tax Receipts (80G)</strong> section. Make sure your PAN is added in your profile so the receipt is valid for tax filing.' },
+            { q: 'Can I choose which program my donation supports?', a: 'Yes. On the <strong>Make a Donation</strong> page you can pick a specific program. If you prefer us to allocate funds where the need is greatest, choose <strong>Where It Is Needed Most</strong>.' },
+            { q: 'How do I pause or cancel a monthly donation?', a: 'Go to <strong>Recurring Giving</strong> in the sidebar, find the plan and use the pause or cancel action. Changes take effect from the next billing cycle — no charges will be made after cancellation.' },
+            { q: 'Is my donation eligible for tax deduction?', a: 'Yes. Stackly Charity is registered under Section 12A and donations are eligible for deduction under Section 80G of the Income Tax Act, 1961. Please consult your tax advisor for the exact deduction applicable to you.' },
+            { q: 'How can I volunteer with Stackly?', a: 'Open the <strong>Volunteering</strong> section to see upcoming shifts and sign up. Most opportunities need no prior experience — our coordinators brief you before every shift.' },
+            { q: 'How is my donation used?', a: 'A minimum of 90% of every donation goes directly to program delivery. Administrative costs are covered separately by our institutional partners. Our audited financial statements are published annually under <strong>Help &amp; Support → Reports &amp; Audits</strong>.' }
+        ];
+
+        let pendingUploads = [];
+
+        /* ==================================================
+           SESSION / INIT
+        ================================================== */
+        const userName = localStorage.getItem('loggedInUserName') || 'Aarav Sharma';
+        const userEmail = localStorage.getItem('loggedInUserEmail') || 'donor@gmail.com';
+        const userRole = localStorage.getItem('userRole');
+
+        if (userRole && userRole !== 'customer') {
+            window.location.href = 'index.html';
+        }
+
+        function init() {
+            const initials = userName.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
+
+            document.getElementById('sidebarName').textContent = userName;
+            document.getElementById('sidebarAvatar').textContent = initials;
+            document.getElementById('sidebarRole').textContent = userEmail;
+            document.getElementById('headerName').textContent = userName;
+            document.getElementById('headerAvatar').textContent = initials;
+            document.getElementById('profileName').textContent = userName;
+            document.getElementById('profileEmail').textContent = userEmail;
+            document.getElementById('profileAvatar').textContent = initials;
+            document.getElementById('editName').value = userName;
+            document.getElementById('editEmail').value = userEmail;
+
+            document.getElementById('donorName').value = userName;
+            document.getElementById('donorEmail').value = userEmail;
+
+            buildProgramFilters();
+            buildDonateProgramSelect();
+            updateStats();
+            renderRecentDonations();
+            renderSupportedPrograms();
+            renderDonations();
+            renderReceipts();
+            renderRecurring();
+            renderPrograms();
+            renderVolunteer();
+            renderMessages();
+            renderActivity();
+            renderFaqs();
+            updateDonationSummary();
+            updateNavBadges();
+        }
+
+        function updateNavBadges() {
+            const unread = messages.filter(m => m.unread).length;
+            document.getElementById('navMsgCount').textContent = unread;
+            document.getElementById('navMsgCount').style.display = unread ? 'inline-block' : 'none';
+            document.getElementById('navDonationCount').textContent = donations.length;
+            document.getElementById('navRecurringCount').textContent = recurringGiving.filter(r => r.status === 'active').length;
+        }
+
+        /* ==================================================
+           NAVIGATION
+        ================================================== */
+        function switchView(view) {
+            document.querySelectorAll('.view-section').forEach(s => s.classList.remove('active'));
+            const target = document.getElementById('view-' + view);
+            if (target) target.classList.add('active');
+
+            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+            const activeNav = document.querySelector('.nav-item[data-view="' + view + '"]');
+            if (activeNav) activeNav.classList.add('active');
+
+            const titles = {
+                dashboard: 'Dashboard <span>— Overview</span>',
+                donations: 'My Donations <span>— Giving History</span>',
+                donate: 'Make a Donation <span>— Give Now</span>',
+                receipts: 'Tax Receipts <span>— 80G</span>',
+                recurring: 'Recurring Giving <span>— Monthly Plans</span>',
+                programs: 'Our Programs <span>— Causes</span>',
+                volunteer: 'Volunteering <span>— Shifts &amp; Hours</span>',
+                messages: 'Messages <span>— Inbox</span>',
+                activity: 'Activity <span>— History</span>',
+                profile: 'Profile <span>— Settings</span>',
+                help: 'Help &amp; Support <span>— Resources</span>'
+            };
+            document.getElementById('pageTitle').innerHTML = titles[view] || view;
+
+            if (window.innerWidth <= 768) toggleSidebar(false);
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function toggleSidebar(force) {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('sidebarOverlay');
+            const shouldOpen = force !== undefined ? force : !sidebar.classList.contains('open');
+            sidebar.classList.toggle('open', shouldOpen);
+            overlay.classList.toggle('show', shouldOpen);
+            document.body.style.overflow = shouldOpen && window.innerWidth <= 768 ? 'hidden' : '';
+        }
+
+        function toggleSection(labelElement) {
+            labelElement.closest('.nav-section').classList.toggle('collapsed');
+        }
+
+        /* ==================================================
+           HELPERS
+        ================================================== */
+        function formatINR(num) {
+            return '₹' + Number(num).toLocaleString('en-IN');
+        }
+
+        function togglePassword(inputId, iconEl) {
+            const input = document.getElementById(inputId);
+            if (!input) return;
+
+            const isPassword = input.type === 'password';
+            input.type = isPassword ? 'text' : 'password';
+
+            iconEl.classList.toggle('fa-eye', !isPassword);
+            iconEl.classList.toggle('fa-eye-slash', isPassword);
+            iconEl.setAttribute('aria-label', isPassword ? 'Hide password' : 'Show password');
+        }
+        window.togglePassword = togglePassword;
+
+        function getStatusBadge(status) {
+            const labels = {
+                completed: 'Completed', pending: 'Pending', failed: 'Failed',
+                issued: 'Issued', processing: 'Processing', active: 'Active',
+                paused: 'Paused', closed: 'Closed', upcoming: 'Upcoming'
+            };
+            return '<span class="status-badge status-' + status + '">' + (labels[status] || status) + '</span>';
+        }
+
+        function updateStats() {
+            const completed = donations.filter(d => d.status === 'completed');
+            const total = completed.reduce((sum, d) => sum + d.amount, 0);
+
+            const supportedNames = [...new Set(completed.map(d => d.program))];
+            const lives = programs
+                .filter(p => supportedNames.includes(p.name))
+                .reduce((sum, p) => sum + p.beneficiaries, 0);
+
+            const hours = volunteerShifts
+                .filter(s => s.status === 'completed')
+                .reduce((sum, s) => sum + (s.hours || 0), 0);
+
+            document.getElementById('statTotalDonated').textContent = formatINR(total);
+            document.getElementById('statLives').textContent = lives.toLocaleString('en-IN');
+            document.getElementById('statPrograms').textContent = supportedNames.length;
+            document.getElementById('statHours').textContent = hours;
+
+            document.getElementById('volHours').textContent = hours;
+            document.getElementById('volUpcoming').textContent = volunteerShifts.filter(s => s.status === 'upcoming').length;
+            document.getElementById('volBadge').textContent = hours >= 40 ? 'Gold' : hours >= 20 ? 'Silver' : 'Bronze';
+
+            const issued = receipts.filter(r => r.status === 'issued');
+            document.getElementById('rcptCount').textContent = issued.length;
+            document.getElementById('rcptTotal').textContent = formatINR(issued.reduce((s, r) => s + r.amount, 0));
+            document.getElementById('rcptProcessing').textContent = receipts.filter(r => r.status === 'processing').length;
+        }
+
+        /* ==================================================
+           DASHBOARD
+        ================================================== */
+        function renderRecentDonations() {
+            const recent = donations.slice(0, 5);
+            const container = document.getElementById('recentDonationsList');
+            if (!recent.length) {
+                container.innerHTML = '<div class="empty-state"><i class="fas fa-hand-holding-heart"></i><h4>No donations yet</h4><p>Make your first contribution to get started</p></div>';
+                return;
+            }
+            container.innerHTML =
+                '<div class="table-scroll"><table class="doc-table responsive-table"><tbody>' +
+                recent.map(d => (
+                    '<tr>' +
+                        '<td class="cell-main"><div class="doc-name">' +
+                            '<div class="doc-icon"><i class="fas fa-heart"></i></div>' +
+                            '<div><div style="font-weight:600;color:var(--primary);">' + d.program + '</div>' +
+                            '<div style="font-size:0.78rem;color:var(--text-muted);">' + d.receipt + ' • ' + d.method + '</div></div>' +
+                        '</div></td>' +
+                        '<td data-label="Date">' + d.date + '</td>' +
+                        '<td data-label="Amount"><strong style="color:var(--primary);">' + formatINR(d.amount) + '</strong></td>' +
+                        '<td data-label="Status">' + getStatusBadge(d.status) + '</td>' +
+                        '<td class="cell-actions">' +
+                            '<div class="action-btns">' +
+                                '<button class="action-btn" title="Download Receipt" onclick="showToast(\'success\',\'Download Started\',\'' + d.receipt + '\')"><i class="fas fa-download"></i></button>' +
+                                '<button class="action-btn" title="Repeat Donation" onclick="repeatDonation(' + d.id + ')"><i class="fas fa-redo"></i></button>' +
+                            '</div>' +
+                        '</td>' +
+                    '</tr>'
+                )).join('') +
+                '</tbody></table></div>';
+        }
+
+        function renderSupportedPrograms() {
+            const completed = donations.filter(d => d.status === 'completed');
+            const names = [...new Set(completed.map(d => d.program))];
+            const list = programs.filter(p => names.includes(p.name)).slice(0, 3);
+            const container = document.getElementById('supportedProgramsList');
+
+            if (!list.length) {
+                container.innerHTML = '<div class="empty-state"><i class="fas fa-seedling"></i><h4>No programs supported yet</h4><p>Choose a cause you care about</p></div>';
+                return;
+            }
+
+            container.innerHTML = '<div style="display:flex;flex-direction:column;gap:20px;">' +
+                list.map(p => {
+                    const pct = Math.min(100, Math.round((p.raised / p.goal) * 100));
+                    return '<div>' +
+                        '<div style="display:flex;justify-content:space-between;gap:12px;margin-bottom:8px;flex-wrap:wrap;">' +
+                            '<strong style="color:var(--primary);font-size:0.92rem;">' + p.name + '</strong>' +
+                            '<span style="font-size:0.82rem;color:var(--text-muted);">' + formatINR(p.raised) + ' of ' + formatINR(p.goal) + ' • ' + pct + '%</span>' +
+                        '</div>' +
+                        '<div class="progress-track"><div class="progress-fill" style="width:' + pct + '%"></div></div>' +
+                    '</div>';
+                }).join('') + '</div>';
+        }
+
+        /* ==================================================
+           DONATIONS TABLE
+        ================================================== */
+        function buildProgramFilters() {
+            const sel = document.getElementById('donProgramFilter');
+            if (!sel) return;
+            const names = [...new Set(donations.map(d => d.program))].sort();
+            sel.innerHTML = '<option value="all">All Programs</option>' +
+                names.map(n => '<option value="' + n + '">' + n + '</option>').join('');
+        }
+
+        function renderDonations() {
+            const tbody = document.getElementById('donationsTableBody');
+            const search = (document.getElementById('donSearch')?.value || '').toLowerCase();
+            const status = document.getElementById('donStatusFilter')?.value || 'all';
+            const program = document.getElementById('donProgramFilter')?.value || 'all';
+
+            const filtered = donations.filter(d =>
+                (d.receipt.toLowerCase().includes(search) || d.program.toLowerCase().includes(search)) &&
+                (status === 'all' || d.status === status) &&
+                (program === 'all' || d.program === program)
+            );
+
+            if (!filtered.length) {
+                tbody.innerHTML = '<tr><td colspan="6"><div class="empty-state"><i class="fas fa-search"></i><h4>No donations found</h4><p>Try adjusting your filters</p></div></td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = filtered.map(d => (
+                '<tr>' +
+                    '<td class="cell-main"><div class="doc-name">' +
+                        '<div class="doc-icon"><i class="fas fa-heart"></i></div>' +
+                        '<div><div style="font-weight:600;color:var(--primary);">' + d.program + '</div>' +
+                        '<div style="font-size:0.78rem;color:var(--text-muted);">' + d.receipt + ' • ' + d.method + '</div></div>' +
+                    '</div></td>' +
+                    '<td data-label="Date">' + d.date + '</td>' +
+                    '<td data-label="Type">' + d.type + '</td>' +
+                    '<td data-label="Amount"><strong style="color:var(--primary);">' + formatINR(d.amount) + '</strong></td>' +
+                    '<td data-label="Status">' + getStatusBadge(d.status) + '</td>' +
+                    '<td class="cell-actions"><div class="action-btns">' +
+                        '<button class="action-btn" title="Download Receipt" onclick="showToast(\'success\',\'Download Started\',\'' + d.receipt + '\')"><i class="fas fa-download"></i></button>' +
+                        '<button class="action-btn" title="View Details" onclick="showToast(\'info\',\'Donation Details\',\'Opening ' + d.receipt + '...\')"><i class="fas fa-eye"></i></button>' +
+                        '<button class="action-btn" title="Repeat Donation" onclick="repeatDonation(' + d.id + ')"><i class="fas fa-redo"></i></button>' +
+                    '</div></td>' +
+                '</tr>'
+            )).join('');
+        }
+
+        function repeatDonation(id) {
+            const d = donations.find(x => x.id === id);
+            if (!d) return;
+            switchView('donate');
+            document.getElementById('customAmount').value = d.amount;
+            clearAmountSelection();
+            document.getElementById('donateProgram').value = d.program;
+            updateDonationSummary();
+            showToast('info', 'Donation Prefilled', 'Review the details and confirm your ' + formatINR(d.amount) + ' gift.');
+        }
+
+        /* ==================================================
+           DONATION FORM
+        ================================================== */
+        function buildDonateProgramSelect() {
+            const sel = document.getElementById('donateProgram');
+            sel.innerHTML = '<option value="Where It Is Needed Most">Where It Is Needed Most</option>' +
+                programs.filter(p => p.status === 'active').map(p => '<option value="' + p.name + '">' + p.name + '</option>').join('');
+        }
+
+        let selectedFrequency = 'One-time';
+
+        function setFrequency(btn) {
+            document.querySelectorAll('.freq-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            selectedFrequency = btn.dataset.freq;
+            updateDonationSummary();
+        }
+
+        function setAmount(btn, value) {
+            document.querySelectorAll('.amount-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            document.getElementById('customAmount').value = value;
+            updateDonationSummary();
+        }
+
+        function clearAmountSelection() {
+            document.querySelectorAll('.amount-btn').forEach(b => b.classList.remove('active'));
+        }
+
+        function selectPay(radio) {
+            document.querySelectorAll('.pay-option').forEach(o => o.classList.remove('selected'));
+            radio.closest('.pay-option').classList.add('selected');
+            updateDonationSummary();
+        }
+
+        function getSelectedAmount() {
+            const val = parseInt(document.getElementById('customAmount').value, 10);
+            return isNaN(val) ? 0 : val;
+        }
+
+        function getSelectedMethod() {
+            const r = document.querySelector('input[name="payMethod"]:checked');
+            return r ? r.value : 'UPI';
+        }
+
+        function updateDonationSummary() {
+            const amount = getSelectedAmount();
+            const program = document.getElementById('donateProgram').value;
+            const method = getSelectedMethod();
+            const wantsReceipt = document.getElementById('taxReceipt').checked;
+
+            document.getElementById('sumFreq').textContent = selectedFrequency;
+            document.getElementById('sumProgram').textContent = program;
+            document.getElementById('sumMethod').textContent = method;
+            document.getElementById('sumReceipt').textContent = wantsReceipt ? 'Yes' : 'No';
+            document.getElementById('sumAmount').textContent = formatINR(amount);
+
+            let impact = 'Your contribution helps us keep our programs running for the communities that need them most.';
+            if (amount >= 10000) impact = formatINR(amount) + ' can fund a full month of community kitchen meals for around 400 people.';
+            else if (amount >= 5000) impact = formatINR(amount) + ' can provide school supplies and books for around 10 children for a year.';
+            else if (amount >= 2500) impact = formatINR(amount) + ' can supply clean drinking water to a family for six months.';
+            else if (amount >= 1000) impact = formatINR(amount) + ' can cover a health screening camp for around 15 people.';
+            else if (amount > 0) impact = formatINR(amount) + ' can provide a week of nutritious meals for a child.';
+
+            if (selectedFrequency === 'Monthly') impact += ' Recurring monthly support lets us plan long-term.';
+            document.getElementById('impactText').textContent = impact;
+        }
+
+        document.addEventListener('change', function (e) {
+            if (e.target && (e.target.id === 'taxReceipt' || e.target.id === 'anonymous')) updateDonationSummary();
+        });
+
+        function submitDonation() {
+            const amount = getSelectedAmount();
+            const program = document.getElementById('donateProgram').value;
+            const name = document.getElementById('donorName').value.trim();
+            const email = document.getElementById('donorEmail').value.trim();
+            const pan = document.getElementById('donorPan').value.trim();
+
+            if (amount < 1) { showToast('error', 'Invalid Amount', 'Please enter a donation amount of at least ₹1.'); return; }
+            if (!name) { showToast('error', 'Missing Name', 'Please enter your full name.'); return; }
+            if (!email || !email.includes('@')) { showToast('error', 'Invalid Email', 'Please enter a valid email address.'); return; }
+            if (document.getElementById('taxReceipt').checked && pan && pan.length !== 10) {
+                showToast('error', 'Invalid PAN', 'PAN must be exactly 10 characters.'); return;
+            }
+
+            const receiptNo = 'DON-2026-' + String(500 + donations.length).padStart(4, '0');
+            const today = new Date().toISOString().split('T')[0];
+            const method = getSelectedMethod();
+
+            donations.unshift({
+                id: Date.now(),
+                receipt: receiptNo,
+                program: program,
+                date: today,
+                amount: amount,
+                method: method,
+                status: 'pending',
+                type: selectedFrequency
+            });
+
+            if (selectedFrequency === 'Monthly') {
+                recurringGiving.unshift({
+                    id: Date.now() + 1,
+                    program: program,
+                    frequency: 'Monthly',
+                    amount: amount,
+                    nextDate: '2026-09-01',
+                    status: 'active',
+                    method: method
+                });
+                renderRecurring();
+            }
+
+            if (document.getElementById('taxReceipt').checked) {
+                receipts.unshift({
+                    id: Date.now() + 2,
+                    number: '80G/2026-27/' + receiptNo.split('-')[2],
+                    donation: receiptNo,
+                    fy: '2026-27',
+                    date: today,
+                    amount: amount,
+                    status: 'processing'
+                });
+                renderReceipts();
+            }
+
+            updateStats();
+            renderDonations();
+            renderRecentDonations();
+            renderSupportedPrograms();
+            updateNavBadges();
+
+            showToast('success', 'Thank You!', 'Your ' + formatINR(amount) + ' donation to ' + program + ' is being processed.');
+            setTimeout(() => switchView('donations'), 900);
+        }
+
+        /* ==================================================
+           RECEIPTS
+        ================================================== */
+        function renderReceipts() {
+            const tbody = document.getElementById('receiptsTableBody');
+            const fy = document.getElementById('fyFilter')?.value || 'all';
+            const filtered = receipts.filter(r => fy === 'all' || r.fy === fy);
+
+            if (!filtered.length) {
+                tbody.innerHTML = '<tr><td colspan="6"><div class="empty-state"><i class="fas fa-file-invoice-dollar"></i><h4>No receipts found</h4><p>Receipts appear here after a successful donation</p></div></td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = filtered.map(r => (
+                '<tr>' +
+                    '<td class="cell-main"><div class="doc-name">' +
+                        '<div class="doc-icon"><i class="fas fa-file-pdf"></i></div>' +
+                        '<div><div style="font-weight:600;color:var(--primary);">' + r.number + '</div>' +
+                        '<div style="font-size:0.78rem;color:var(--text-muted);">FY ' + r.fy + '</div></div>' +
+                    '</div></td>' +
+                    '<td data-label="Donation">' + r.donation + '</td>' +
+                    '<td data-label="Date">' + r.date + '</td>' +
+                    '<td data-label="Amount"><strong style="color:var(--primary);">' + formatINR(r.amount) + '</strong></td>' +
+                    '<td data-label="Status">' + getStatusBadge(r.status) + '</td>' +
+                    '<td class="cell-actions"><div class="action-btns">' +
+                        '<button class="action-btn" title="Download" onclick="showToast(\'success\',\'Download\',\'Downloading ' + r.number + '\')"><i class="fas fa-download"></i></button>' +
+                        '<button class="action-btn" title="Email" onclick="showToast(\'success\',\'Sent\',\'Receipt emailed to ' + userEmail + '\')"><i class="fas fa-envelope"></i></button>' +
+                    '</div></td>' +
+                '</tr>'
+            )).join('');
+        }
+
+        /* ==================================================
+           RECURRING GIVING
+        ================================================== */
+        function renderRecurring() {
+            const tbody = document.getElementById('recurringTableBody');
+            if (!recurringGiving.length) {
+                tbody.innerHTML = '<tr><td colspan="6"><div class="empty-state"><i class="fas fa-sync-alt"></i><h4>No recurring plans</h4><p>Start a monthly gift to support a program</p></div></td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = recurringGiving.map(r => (
+                '<tr>' +
+                    '<td class="cell-main"><div class="doc-name">' +
+                        '<div class="doc-icon"><i class="fas fa-sync-alt"></i></div>' +
+                        '<div><div style="font-weight:600;color:var(--primary);">' + r.program + '</div>' +
+                        '<div style="font-size:0.78rem;color:var(--text-muted);">' + r.method + '</div></div>' +
+                    '</div></td>' +
+                    '<td data-label="Frequency">' + r.frequency + '</td>' +
+                    '<td data-label="Amount"><strong style="color:var(--primary);">' + formatINR(r.amount) + '</strong></td>' +
+                    '<td data-label="Next Charge">' + r.nextDate + '</td>' +
+                    '<td data-label="Status">' + getStatusBadge(r.status) + '</td>' +
+                    '<td class="cell-actions"><div class="action-btns">' +
+                        (r.status === 'active'
+                            ? '<button class="action-btn" title="Pause" onclick="toggleRecurring(' + r.id + ')"><i class="fas fa-pause"></i></button>'
+                            : '<button class="action-btn" title="Resume" onclick="toggleRecurring(' + r.id + ')"><i class="fas fa-play"></i></button>') +
+                        '<button class="action-btn" title="Cancel" style="color:var(--error);" onclick="cancelRecurring(' + r.id + ')"><i class="fas fa-times"></i></button>' +
+                    '</div></td>' +
+                '</tr>'
+            )).join('');
+        }
+
+        function toggleRecurring(id) {
+            const plan = recurringGiving.find(r => r.id === id);
+            if (!plan) return;
+            plan.status = plan.status === 'active' ? 'paused' : 'active';
+            renderRecurring();
+            updateNavBadges();
+            showToast('success', plan.status === 'active' ? 'Plan Resumed' : 'Plan Paused',
+                plan.program + ' — ' + formatINR(plan.amount) + ' ' + plan.frequency);
+        }
+
+        function cancelRecurring(id) {
+            if (!confirm('Cancel this recurring donation? No further charges will be made.')) return;
+            recurringGiving = recurringGiving.filter(r => r.id !== id);
+            renderRecurring();
+            updateNavBadges();
+            showToast('success', 'Plan Cancelled', 'Your recurring donation has been cancelled.');
+        }
+
+        /* ==================================================
+           PROGRAMS
+        ================================================== */
+        function renderPrograms() {
+            const grid = document.getElementById('programsGrid');
+            grid.innerHTML = programs.map(p => {
+                const pct = Math.min(100, Math.round((p.raised / p.goal) * 100));
+                return '<div class="program-card">' +
+                    '<div class="program-top">' +
+                        '<div class="program-icon"><i class="fas ' + p.icon + '"></i></div>' +
+                        '<div class="program-head">' +
+                            '<div class="program-name">' + p.name + '</div>' +
+                            '<div class="program-cat">' + p.category + '</div>' +
+                        '</div>' +
+                        getStatusBadge(p.status === 'completed' ? 'closed' : 'active') +
+                    '</div>' +
+                    '<p class="program-desc">' + p.description + '</p>' +
+                    '<div class="progress-track"><div class="progress-fill" style="width:' + pct + '%"></div></div>' +
+                    '<div class="program-stats"><span>' + formatINR(p.raised) + ' raised</span><span>Goal ' + formatINR(p.goal) + '</span></div>' +
+                    '<div class="program-meta">' +
+                        '<span><i class="fas fa-users"></i> ' + p.beneficiaries.toLocaleString('en-IN') + ' beneficiaries</span>' +
+                        '<span><i class="fas fa-chart-pie"></i> ' + pct + '% funded</span>' +
+                    '</div>' +
+                    '<button class="btn btn-accent btn-sm btn-block" onclick="supportProgram(\'' + p.name + '\')">' +
+                        '<i class="fas fa-heart"></i> Support this Program' +
+                    '</button>' +
+                '</div>';
+            }).join('');
+        }
+
+        function supportProgram(name) {
+            switchView('donate');
+            document.getElementById('donateProgram').value = name;
+            updateDonationSummary();
+        }
+
+        /* ==================================================
+           VOLUNTEERING
+        ================================================== */
+        function renderVolunteer() {
+            const container = document.getElementById('volunteerList');
+            const upcoming = volunteerShifts.filter(s => s.status === 'upcoming');
+            const past = volunteerShifts.filter(s => s.status === 'completed');
+
+            let html = '<h4 style="margin-bottom:12px;color:var(--primary);font-size:0.95rem;"><i class="fas fa-calendar-check"></i> Upcoming Shifts</h4>';
+            html += upcoming.length
+                ? upcoming.map(s =>
+                    '<div class="appointment-item">' +
+                        '<div class="appointment-date-box"><span class="day">' + s.day + '</span><span class="month">' + s.month + '</span></div>' +
+                        '<div class="appointment-info">' +
+                            '<h4>' + s.title + '</h4>' +
+                            '<p><i class="fas fa-user-tag"></i> ' + s.role + ' &nbsp;|&nbsp; <i class="fas fa-clock"></i> ' + s.time + '</p>' +
+                            '<p><i class="fas fa-map-marker-alt"></i> ' + s.location + '</p>' +
+                        '</div>' +
+                        '<div class="action-btns">' +
+                            '<button class="action-btn" title="Reschedule" onclick="event.stopPropagation();showToast(\'info\',\'Reschedule\',\'Opening reschedule options...\')"><i class="fas fa-calendar-alt"></i></button>' +
+                            '<button class="action-btn" title="Cancel" style="color:var(--error);" onclick="event.stopPropagation();cancelShift(' + s.id + ')"><i class="fas fa-times"></i></button>' +
+                        '</div>' +
+                    '</div>'
+                ).join('')
+                : '<div class="empty-state"><i class="fas fa-calendar"></i><h4>No upcoming shifts</h4><p>Sign up for a volunteer opportunity</p></div>';
+
+            html += '<h4 style="margin:24px 0 12px;color:var(--text-muted);font-size:0.95rem;"><i class="fas fa-history"></i> Completed Shifts</h4>';
+            html += past.length
+                ? past.map(s =>
+                    '<div class="appointment-item" style="opacity:0.78;">' +
+                        '<div class="appointment-date-box" style="background:var(--text-muted);"><span class="day">' + s.day + '</span><span class="month">' + s.month + '</span></div>' +
+                        '<div class="appointment-info">' +
+                            '<h4>' + s.title + '</h4>' +
+                            '<p><i class="fas fa-user-tag"></i> ' + s.role + ' &nbsp;|&nbsp; <i class="fas fa-clock"></i> ' + s.time + '</p>' +
+                        '</div>' +
+                        '<span style="font-size:0.8rem;color:var(--text-muted);font-weight:600;">' + (s.hours || 0) + ' hrs logged</span>' +
+                    '</div>'
+                ).join('')
+                : '<div class="empty-state"><i class="fas fa-history"></i><h4>No completed shifts</h4></div>';
+
+            container.innerHTML = html;
+        }
+
+        function cancelShift(id) {
+            if (!confirm('Cancel this volunteer shift?')) return;
+            volunteerShifts = volunteerShifts.filter(s => s.id !== id);
+            renderVolunteer();
+            updateStats();
+            showToast('success', 'Shift Cancelled', 'Your volunteer shift has been cancelled.');
+        }
+
+        /* ==================================================
+           MESSAGES / ACTIVITY / FAQ
+        ================================================== */
+        function renderMessages() {
+            const container = document.getElementById('messagesList');
+            if (!messages.length) {
+                container.innerHTML = '<div class="empty-state"><i class="fas fa-envelope"></i><h4>No messages</h4></div>';
+                return;
+            }
+            container.innerHTML = messages.map(m =>
+                '<div class="message-item ' + (m.unread ? 'unread' : '') + '" onclick="openMessage(' + m.id + ')">' +
+                    '<div class="message-avatar" style="background:' + m.color + ';">' + m.initials + '</div>' +
+                    '<div class="message-content">' +
+                        '<div class="message-sender">' + m.sender +
+                            (m.unread ? ' <span style="font-size:0.7rem;color:var(--accent-hover);margin-left:6px;">● New</span>' : '') +
+                        '</div>' +
+                        '<div class="message-preview"><strong>' + m.subject + '</strong> — ' + m.preview + '</div>' +
+                    '</div>' +
+                    '<div class="message-time">' + m.time + '</div>' +
+                '</div>'
+            ).join('');
+        }
+
+        function openMessage(id) {
+            const m = messages.find(x => x.id === id);
+            if (m) m.unread = false;
+            renderMessages();
+            updateNavBadges();
+            showToast('info', 'Opening Message', 'Loading conversation with ' + (m ? m.sender : '') + '...');
+        }
+
+        function renderActivity() {
+            const colorMap = {
+                success: 'var(--success)', info: 'var(--info)', error: 'var(--error)',
+                purple: '#805ad5', teal: '#319795', warning: 'var(--warning)'
+            };
+            document.getElementById('activityList').innerHTML = activities.map(a =>
+                '<div class="activity-item">' +
+                    '<div class="activity-icon" style="color:' + (colorMap[a.color] || 'var(--primary)') + ';">' +
+                        '<i class="fas ' + a.icon + '"></i>' +
+                    '</div>' +
+                    '<div class="activity-content">' +
+                        '<div class="activity-text">' + a.text + '</div>' +
+                        '<div class="activity-time"><i class="far fa-clock" style="margin-right:4px;"></i>' + a.time + '</div>' +
+                    '</div>' +
+                '</div>'
+            ).join('');
+        }
+
+        function renderFaqs() {
+            document.getElementById('faqList').innerHTML = faqs.map((faq, i) =>
+                '<div class="faq-item" id="faq-' + i + '">' +
+                    '<div class="faq-question" onclick="toggleFaq(' + i + ')">' +
+                        '<span>' + faq.q + '</span>' +
+                        '<i class="fas fa-chevron-down" id="faqIcon-' + i + '" style="transition:transform 0.3s;"></i>' +
+                    '</div>' +
+                    '<div class="faq-answer">' + faq.a + '</div>' +
+                '</div>'
+            ).join('');
+        }
+
+        function toggleFaq(index) {
+            const item = document.getElementById('faq-' + index);
+            const icon = document.getElementById('faqIcon-' + index);
+            const isOpen = item.classList.contains('open');
+
+            document.querySelectorAll('.faq-item').forEach(f => f.classList.remove('open'));
+            document.querySelectorAll('[id^="faqIcon-"]').forEach(i => i.style.transform = 'rotate(0deg)');
+
+            if (!isOpen) {
+                item.classList.add('open');
+                icon.style.transform = 'rotate(180deg)';
+            }
+        }
+
+        /* ==================================================
+           PROFILE
+        ================================================== */
+        function saveProfile() {
+            const name = document.getElementById('editName').value.trim();
+            if (!name) { showToast('error', 'Invalid Name', 'Name cannot be empty.'); return; }
+
+            const pan = document.getElementById('editPan').value.trim();
+            if (pan && pan.length !== 10) { showToast('error', 'Invalid PAN', 'PAN must be exactly 10 characters.'); return; }
+
+            localStorage.setItem('loggedInUserName', name);
+            init();
+            showToast('success', 'Profile Updated', 'Your profile details have been saved.');
+        }
+
+        function resetProfile() {
+            document.getElementById('editName').value = userName;
+            document.getElementById('editPhone').value = '';
+            document.getElementById('editPan').value = '';
+            document.getElementById('editAddress').value = '';
+            document.getElementById('editCity').value = '';
+            document.getElementById('editPostal').value = '';
+            showToast('info', 'Reset', 'Form values restored.');
+        }
+
+        function changePassword() {
+            const curr = document.getElementById('currPassword').value;
+            const neu = document.getElementById('newPassword').value;
+            const conf = document.getElementById('confirmPassword').value;
+
+            if (!curr || !neu || !conf) { showToast('error', 'Missing Fields', 'Please fill all password fields.'); return; }
+            if (neu !== conf) { showToast('error', 'Mismatch', 'New passwords do not match.'); return; }
+            if (neu.length < 8) { showToast('error', 'Too Short', 'Password must be at least 8 characters.'); return; }
+
+            document.getElementById('currPassword').value = '';
+            document.getElementById('newPassword').value = '';
+            document.getElementById('confirmPassword').value = '';
+            showToast('success', 'Password Updated', 'Your password has been changed.');
+        }
+
+        /* ==================================================
+           TOAST / LOGOUT
+        ================================================== */
+        function showToast(type, title, msg) {
+            const toast = document.getElementById('toast');
+            const icon = document.getElementById('toastIcon');
+            const tTitle = document.getElementById('toastTitle');
+            const tMsg = document.getElementById('toastMsg');
+
+            toast.className = 'toast ' + type;
+            icon.textContent = type === 'success' ? '✅' : type === 'error' ? '❌' : 'ℹ️';
+            tTitle.textContent = title;
+            tMsg.textContent = msg;
+
+            requestAnimationFrame(() => toast.classList.add('show'));
+            clearTimeout(window.__toastTimer);
+            window.__toastTimer = setTimeout(() => toast.classList.remove('show'), 3200);
+        }
+
+        function handleLogout() {
+            if (!confirm('Are you sure you want to sign out?')) return;
+            localStorage.clear();
+            window.location.href = 'index.html';
+        }
+
+        /* ==================================================
+           MISC
+        ================================================== */
+        window.addEventListener('resize', function () {
+            if (window.innerWidth > 768) {
+                document.body.style.overflow = '';
+                document.getElementById('sidebarOverlay').classList.remove('show');
+                document.getElementById('sidebar').classList.remove('open');
+            }
+        });
+
+        document.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+</html>
